@@ -2,6 +2,7 @@ const express = require("express");
 const PostSchema = require("../../models/PostSchema");
 const basicAuth = require("basic-auth");
 const multer = require("multer");
+const q2m = require("query-to-mongo");
 const fs = require("fs").promises;
 const { join } = require("path");
 const router = express.Router();
@@ -12,7 +13,18 @@ router
   .route("/")
   .get(async (req, res, next) => {
     try {
+      const { query } = req;
+
+      const queryToMongo = q2m(query);
+      const criteria = queryToMongo.criteria;
+
+      for (let key in criteria) {
+        if (typeof criteria[key] !== "object") {
+          criteria[key] = { $regex: `${criteria[key]}`, $options: "i" };
+        }
+      }
       await PostSchema.aggregate([
+        { $match: criteria },
         {
           $lookup: {
             from: "profiles",
