@@ -12,7 +12,6 @@ router
   .route("/")
   .get(async (req, res, next) => {
     try {
-      const user = basicAuth(req);
       await PostSchema.aggregate([
         {
           $lookup: {
@@ -21,6 +20,9 @@ router
             foreignField: "username",
             as: "user",
           },
+        },
+        {
+          $unwind: "$user",
         },
       ]).exec(function (err, posts) {
         if (err) {
