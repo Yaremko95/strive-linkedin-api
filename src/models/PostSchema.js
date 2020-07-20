@@ -12,25 +12,16 @@ const PostSchema = new Schema ({
 
     image:{
         type:String,
-        // validate: {
-        //     validator: (url) => {
-        //         if (!v.isURL(url)) {
-        //             throw new Error("url: not valid");
-        //         }
-        //     },
-        // },
+        validate: {
+            validator: (url) => {
+                if (!v.isURL(url)) {
+                    throw new Error("url: not valid");
+                }
+            },
+        },
         required:true
     }
 }, {timestamps: true})
-
-PostSchema.virtual('users', {
-    ref: 'Profile', // The model to use
-    localField: 'user', // Find people where `localField`
-    foreignField: 'username', // is equal to `foreignField`
-    justOne: false,
-
-});
-
 
 
 const PostModel = mongoose.model("Post", PostSchema);
