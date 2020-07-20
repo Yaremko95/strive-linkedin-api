@@ -10,8 +10,8 @@ const makeDirectory = require('./utils/mkdir')
 makeDirectory()
 dotenv.config();
 const app = express();
-global.appRoot = __dirname;
-app.use("/static", express.static(path.join(__dirname, "./public")));
+ global.appRoot = __dirname;
+ app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());
 app.use(express.json());
 
