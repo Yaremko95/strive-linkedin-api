@@ -4,6 +4,9 @@ const multer = require("multer");
 const q2m = require("query-to-mongo");
 const fs = require("fs").promises;
 const { join } = require("path");
+const Json2csvParser = require("json2csv").Parser;
+const pump = require("pump");
+const stringify = require("csv-stringify");
 const EducationModel = require("../../models/EduSchema");
 const router = express.Router();
 const upload = multer();
@@ -34,6 +37,64 @@ router
       res.status(500).send("bad request");
     }
   });
+router.route("/:userName/educations/csv").post(async (req, res) => {
+  try {
+    // const dateTime = new Date()
+    //   .toISOString()
+    //   .slice(-24)
+    //   .replace(/\D/g, "")
+    //   .slice(0, 14);
+    // const fields = [
+    //   "id",
+    //   "name",
+    //   "degree",
+    //   "startDate",
+    //   "username",
+    //   "createdAt",
+    //   "updatedAt",
+    // ];
+    //
+    // const filePath = join(
+    //   __dirname,
+    //   "../../",
+    //   "public",
+    //   "exports",
+    //   "csv-" + dateTime + ".csv"
+    // );
+    //
+    // const json2csv = new Transform({
+    //   fields: fields,
+    // });
+    // const data = await EducationModel.find({ username: req.params.userName });
+    // res.setHeader("Content-Disposition", "attachment; filename=export.csv");
+    // pump(data, json2csv, res, (err) => {
+    //   if (err) {
+    //     console.log(err);
+    //   } else {
+    //     console.log("Done");
+    //   }
+    // });
+    const data = await EducationModel.find({ username: req.params.userName });
+    const jsonData = JSON.parse(JSON.stringify(data));
+    console.log(jsonData);
+    const csvFields = [
+      "id",
+      "name",
+      "degree",
+      "startDate",
+      "username",
+      "createdAt",
+      "updatedAt",
+    ];
+    const json2csvParser = new Json2csvParser({ csvFields });
+    const csvData = json2csvParser.parse(jsonData);
+    res.setHeader("Content-disposition", "attachment; filename=customers.csv");
+    res.set("Content-Type", "text/csv");
+    res.status(200).end(csvData);
+  } catch (e) {
+    console.log(e);
+  }
+});
 
 router
   .route("/:userName/educations/:id")
