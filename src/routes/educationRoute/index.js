@@ -39,41 +39,6 @@ router
   });
 router.route("/:userName/educations/csv").post(async (req, res) => {
   try {
-    // const dateTime = new Date()
-    //   .toISOString()
-    //   .slice(-24)
-    //   .replace(/\D/g, "")
-    //   .slice(0, 14);
-    // const fields = [
-    //   "id",
-    //   "name",
-    //   "degree",
-    //   "startDate",
-    //   "username",
-    //   "createdAt",
-    //   "updatedAt",
-    // ];
-    //
-    // const filePath = join(
-    //   __dirname,
-    //   "../../",
-    //   "public",
-    //   "exports",
-    //   "csv-" + dateTime + ".csv"
-    // );
-    //
-    // const json2csv = new Transform({
-    //   fields: fields,
-    // });
-    // const data = await EducationModel.find({ username: req.params.userName });
-    // res.setHeader("Content-Disposition", "attachment; filename=export.csv");
-    // pump(data, json2csv, res, (err) => {
-    //   if (err) {
-    //     console.log(err);
-    //   } else {
-    //     console.log("Done");
-    //   }
-    // });
     const data = await EducationModel.find({ username: req.params.userName });
     const jsonData = JSON.parse(JSON.stringify(data));
     console.log(jsonData);
