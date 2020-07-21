@@ -82,7 +82,8 @@ experienceRouter.delete(
       if (user.name !== data.username) res.status(403).send("unauthorized");
       else {
         const experience = await ExperienceSchema.findByIdAndDelete(
-          req.params.id
+          req.params.id,
+          { ...req.body, username: user.username }
         );
 
         if (experience) {
