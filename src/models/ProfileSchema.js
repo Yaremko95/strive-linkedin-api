@@ -1,6 +1,7 @@
 const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 const v = require("validator");
+
 const UserModel = require('./AuthSchema')
 
 
@@ -47,6 +48,9 @@ const ProfileSchema = new Schema(
     },
     { timestamps: true }
 )
+
+
+
 
 
 
