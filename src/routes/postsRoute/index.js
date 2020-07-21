@@ -52,6 +52,7 @@ router
       const imageUrl =
         "http://localhost:3005/static/profilePictures/default_image.jpg";
       const user = basicAuth(req);
+
       if (await PostSchema.userExists(user.name)) {
         const result = await new PostSchema({
           ...req.body,
