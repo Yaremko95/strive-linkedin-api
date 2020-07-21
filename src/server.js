@@ -2,9 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const dotenv = require("dotenv");
-const mongoose = require('mongoose')
-const authorize = require('./utils/auth')
-const postsRouter = require('./routes/postsRoute')
+const mongoose = require("mongoose");
+const authorize = require("./utils/auth");
+const postsRouter = require("./routes/postsRoute");
 const experienceRouter = require("./routes/experienceRoute");
 const profileRouter = require("./routes/profileRoute");
 const educationRouter = require("./routes/educationRoute");
@@ -19,10 +19,8 @@ app.use(cors());
 app.use(express.json());
 app.use("/profile", authorize, profileRouter);
 app.use("/profile", authorize, educationRouter);
+app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);
-
-app.use('/posts', authorize,  postsRouter)
-app.use('/experience',  experienceRouter)
 
 mongoose
   .connect(process.env.MONGOHOST, {
