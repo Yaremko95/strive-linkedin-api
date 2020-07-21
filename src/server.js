@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const dotenv = require("dotenv");
+
 const mongoose = require("mongoose");
 const authorize = require("./utils/auth");
 const postsRouter = require("./routes/postsRoute");
@@ -11,6 +12,7 @@ const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
 
 makeDirectory();
+
 dotenv.config();
 const app = express();
 global.appRoot = __dirname;
@@ -21,6 +23,8 @@ app.use("/profile", authorize, profileRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);
+
+
 
 mongoose
   .connect(process.env.MONGOHOST, {

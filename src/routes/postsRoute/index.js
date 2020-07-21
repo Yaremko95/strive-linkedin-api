@@ -137,10 +137,12 @@ router.route("/:postId").post(upload.single("post"), async (req, res) => {
           join(postsDirectory, `${req.params.postId}.${extension}`),
           req.file.buffer
         );
+
         let url = `${req.protocol}://${req.host}${
           process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
         }/static/posts/${req.params.postId}.${extension}`;
         await PostSchema.findByIdAndUpdate(req.params.postId, {
+
           image: url,
           username: user.name,
         });
