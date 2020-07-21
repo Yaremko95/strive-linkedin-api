@@ -3,13 +3,21 @@ const cors = require("cors");
 const path = require("path");
 const dotenv = require("dotenv");
 const mongoose = require('mongoose')
+const authorize = require('./utils/auth')
+const postsRouter = require('./routes/postsRoute')
+const profilesRouter = require('./routes/profilesRoute')
+const makeDirectory = require('./utils/mkdir')
 
+makeDirectory()
 dotenv.config();
 const app = express();
 global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());
 app.use(express.json());
+
+app.use('/posts', authorize, postsRouter)
+app.use('/profiles', authorize, profilesRouter)
 
 mongoose
     .connect(process.env.MONGOHOST, {
