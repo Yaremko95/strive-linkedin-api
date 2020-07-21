@@ -17,10 +17,11 @@ global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());
 app.use(express.json());
+
+
 app.use("/profile", authorize, profileRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/posts", authorize, postsRouter);
-
 app.use('/posts', authorize,  postsRouter)
 app.use('/experience',  experienceRouter)
 
