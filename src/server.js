@@ -7,8 +7,9 @@ const mongoose = require("mongoose");
 const authorize = require("./utils/auth");
 const postsRouter = require("./routes/postsRoute");
 const experienceRouter = require("./routes/experienceRoute");
-const profileRouter = require("./routes/profileRoute");
+
 const profilesRouter = require("./routes/profilesRoute");
+
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
 
@@ -24,8 +25,6 @@ app.use("/profiles", authorize, profilesRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);
-
-
 
 mongoose
   .connect(process.env.MONGOHOST, {
