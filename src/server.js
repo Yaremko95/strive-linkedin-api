@@ -7,7 +7,9 @@ const mongoose = require("mongoose");
 const authorize = require("./utils/auth");
 const postsRouter = require("./routes/postsRoute");
 const experienceRouter = require("./routes/experienceRoute");
-const profileRouter = require("./routes/profilesRoute");
+
+const profilesRouter = require("./routes/profilesRoute");
+
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
 
@@ -24,7 +26,7 @@ global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());
 app.use(express.json());
-app.use("/profile", authorize, profileRouter);
+app.use("/profiles", authorize, profilesRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);

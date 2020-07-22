@@ -2,7 +2,7 @@ const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 
 
-const AuthSchema = new Schema ({
+const AuthSchema = new Schema({
     _id: {
         type: String,
         required: true
