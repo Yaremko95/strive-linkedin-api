@@ -26,7 +26,7 @@ global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());
 app.use(express.json());
-app.use("/profiles", authorize, profilesRouter);
+app.use("/profile", authorize, profilesRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);

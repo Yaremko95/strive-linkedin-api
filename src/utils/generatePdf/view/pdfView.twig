@@ -1,424 +1,424 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Resume of {{name}}</title>
-
-
-</head>
-<body>
-<style>
-    body {
-        color: #123;
-        background: #fff;
-        font-size: 16px;
-        text-rendering: optimize-speed;
-    }
-
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: 'ClearSans', serif;
-    }
-
-    a {
-        color: #39b54a;
-    }
-
-    h1,h2,h3,h4,h5,h6 {
-        font-style: normal;
-        font-family: 'ClearSans bold', serif;
-    }
-
-    strong {
-        font-family: 'ClearSans bold';
-    }
-
-    ul {
-        margin-left: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    li {
-        width: 100%;
-        margin-bottom: 1rem;
-        position: relative;
-        list-style-type: none;
-    }
-    li:before {
-        content: '';
-        position: absolute;
-        left: -27px;
-        top:4px;
-        width: 16px;
-        height: 16px;
-        background-size: 100%;
-    }
-
-    p {
-        display: inline-block;
-        margin-bottom: 1.62rem;
-    }
-
-    h3 {
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #ccc;
-        display: block;
-        font-size: 1.5rem;
-    }
-
-    h4 {
-        margin-bottom: 0.62rem;
-        margin-top: 1rem;
-        border-bottom: 1px dashed #333;
-        display: block;
-    }
-
-
-    /************************
-     * CV HEADER
-     ************************/
-
-    header.main {
-        color: #333;
-        /*padding: 0rem 0 2rem 0;*/
-
-        background-size: cover;
-        text-align: center;
-    }
-    header h1 {
-        font-size: 3rem;
-        padding: 2rem 2rem 1rem 2rem;
-        margin-bottom: 2.25rem;
-        border: 3px solid #333;
-        letter-spacing: 0.62rem;
-        display: inline-block;
-        text-transform: uppercase;
-        font-family: 'Spartan', serif;
-    }
-
-    header h2 {
-        display: block;
-        position: relative;
-        margin: 0rem 0;
-        font-family: 'Spartan', serif;
-        font-size: 1.2rem;
-    }
-
-    header.sub {
-        background: #d9d9d9;
-        color: #333;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    header.sub .item {
-        display: inline-block;
-        margin-right: 2rem;
-    }
-
-    header.sub .item:last-child {
-        margin-right: 0;
-    }
-
-
-
-
-    article.main {
-        padding-top: 2rem;
-        margin-left: 33%;
-        width: 100%;
-        float: left;
-    }
-
-    aside {
-        position: absolute;
-        left: 0;
-        /*background: #e2e3eb;*/
-        border-right: 1px solid #e9e9e9;
-        width: 33%;
-        padding: 2rem;
-    }
-
-    aside img {
-        width: 100%;
-        margin-top: 0.62rem;
-        margin-bottom: 1rem;
-    }
-
-    aside h3 {
-        border: none;
-        margin-bottom: 0.5rem;
-    }
-
-    aside p {
-        margin-bottom: 1rem;
-        display: block;
-    }
-
-    div.main {
-        margin-left: 33%;
-        padding: 2rem 2rem 0 2rem;
-    }
-</style>
-<header class="top" style="width:100%;  background-color: #595959; ">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/LinkedIn_Logo.svg/1280px-LinkedIn_Logo.svg.png" style="width: 100px; padding: 10px 10px;">
-</header>
-<header class="main">
-    <h1>{{name}} {{surname}}</h1>
-</header>
-
-<header class="sub">
-    <div class="item">Email: {{email}}</div>
-</header>
-
-<aside>
-    <img src="{{image}}" alt="">
-
-    <article class="entry">
-        <h3>Skills</h3>
-        {% for key, technology in technologies %}
-            <h4>{{key|capitalize}}</h4>
-            <p>Google search</p>
-        {% endfor %}
-    </article>
-
-    <article class="entry">
-        <h3>Spoken languages</h3>
-        <ul>
-            {% for lang in spoken_languages %}
-                <li>English – B2</li>
-            {% endfor %}
-        </ul>
-    </article>
-</aside>
-
-<div class="main">
-    <article class="entry">
-        <h2>{{name}} {{surname}}</h2>
-        <p>Email: {{email}}</p>
-    </article>
-    <article class="entry">
-        <h3>Short biography</h3>
-        <p>
-            I like programming because it never ends. I can make many different things and still have many new different things to make.
-            I love the thrill to get it working
-        </p>
-    </article>
-
-    <article class="entry">
-        <h3>Work experience</h3>
-        <ul>
-            {% for job in experiences %}
-                <li  style="width:100%;  ">
-
-                        <div style="display: inline-block;   vertical-align: middle;">
-                            <strong>{{job.company}}, {{ job.area }}</strong><br>
-                            {{job.startDate}} - {{ job.endDate }}<br>
-                            {{job.role}}<br>
-                            {{ job.description }}
-                         </div>
-                       <div style="display: inline-block; margin-left: 150px;   vertical-align: middle;">
-                        <img src="{{ job.image }}" style="width:50px"/>
-                    </div>
-
-                </li>
-            {% endfor %}
-        </ul>
-    </article>
-
-
-    <article class="entry">
-        <h3>Education</h3>
-        <ul>
-            {% for edu in educations %}
-                <li style="display: flex; justify-content: space-between; align-items: center">
-                    <div>
-                        <strong>
-                            {{edu.startDate}} - {{ edu.endDate }}<br>
-                            {{edu.name}}
-                        </strong> <br>
-                        {{ edu.degree }}
-                    </div>
-                    <div>
-                        <img src="{{ job.image }}" style="width:100px"/>
-                    </div>
-
-                </li>
-            {% endfor %}
-        </ul>
-    </article>
-
-
-
-</div>
-
-</body>
-</html>
-
-{#<!DOCTYPE html>#}
+{#<!doctype html>#}
 {#<html>#}
 {#<head>#}
-{#    <meta charset="UTF-8" />#}
+{#    <meta charset="UTF-8">#}
 {#    <title>Resume of {{name}}</title>#}
+
+
 {#</head>#}
+{#<body>#}
 {#<style>#}
 {#    body {#}
-{#        background-color: #ffffff;#}
-{#        font-family: Arial, Helvetica, sans-serif;#}
-{#    }#}
-{#        * {#}
-{#            margin: 0;#}
-{#            padding: 0;#}
-{#            box-sizing: border-box;#}
-{#            font-family: 'ClearSans', serif;#}
-{#        }#}
-{#    .entry,#}
-{#    header {#}
-{#        background-color: #ffffff;#}
-{#        margin-bottom: 10px;#}
-{#        box-shadow: 1px 5px 8px 0px rgba(153,145,153,1);#}
-{#        width:100%;#}
+{#        color: #123;#}
+{#        background: #fff;#}
+{#        font-size: 16px;#}
+{#        text-rendering: optimize-speed;#}
 {#    }#}
 
-{#    .title span {#}
-{#        display: inline-block;#}
-{#        vertical-align: middle;#}
-{#        font-size: 30px;#}
-{#        margin-right: 10px;#}
-{#        color: #6c7270;#}
-{#        font-weight: 400;#}
+
+{#    * {#}
+{#        margin: 0;#}
+{#        padding: 0;#}
+{#        box-sizing: border-box;#}
+{#        font-family: 'ClearSans', serif;#}
 {#    }#}
-{#    .icon {#}
-{#        width: 45px;#}
+
+{#    a {#}
+{#        color: #39b54a;#}
 {#    }#}
-{#    .text {#}
-{#        margin: 20px 10px;#}
+
+{#    h1,h2,h3,h4,h5,h6 {#}
+{#        font-style: normal;#}
+{#        font-family: 'ClearSans bold', serif;#}
 {#    }#}
+
+{#    strong {#}
+{#        font-family: 'ClearSans bold';#}
+{#    }#}
+
+{#    ul {#}
+{#        margin-left: 2rem;#}
+{#        margin-bottom: 1rem;#}
+{#    }#}
+
 {#    li {#}
+{#        width: 100%;#}
+{#        margin-bottom: 1rem;#}
+{#        position: relative;#}
 {#        list-style-type: none;#}
 {#    }#}
+{#    li:before {#}
+{#        content: '';#}
+{#        position: absolute;#}
+{#        left: -27px;#}
+{#        top:4px;#}
+{#        width: 16px;#}
+{#        height: 16px;#}
+{#        background-size: 100%;#}
+{#    }#}
+
 {#    p {#}
-{#        padding : 5px;#}
-{#        margin : 0;#}
+{#        display: inline-block;#}
+{#        margin-bottom: 1.62rem;#}
+{#    }#}
+
+{#    h3 {#}
+{#        margin-bottom: 1rem;#}
+{#        border-bottom: 1px solid #ccc;#}
+{#        display: block;#}
+{#        font-size: 1.5rem;#}
+{#    }#}
+
+{#    h4 {#}
+{#        margin-bottom: 0.62rem;#}
+{#        margin-top: 1rem;#}
+{#        border-bottom: 1px dashed #333;#}
+{#        display: block;#}
+{#    }#}
+
+
+{#    /************************#}
+{#     * CV HEADER#}
+{#     ************************/#}
+
+{#    header.main {#}
+{#        color: #333;#}
+{#        /*padding: 0rem 0 2rem 0;*/#}
+
+{#        background-size: cover;#}
+{#        text-align: center;#}
+{#    }#}
+{#    header h1 {#}
+{#        font-size: 3rem;#}
+{#        padding: 2rem 2rem 1rem 2rem;#}
+{#        margin-bottom: 2.25rem;#}
+{#        border: 3px solid #333;#}
+{#        letter-spacing: 0.62rem;#}
+{#        display: inline-block;#}
+{#        text-transform: uppercase;#}
+{#        font-family: 'Spartan', serif;#}
+{#    }#}
+
+{#    header h2 {#}
+{#        display: block;#}
+{#        position: relative;#}
+{#        margin: 0rem 0;#}
+{#        font-family: 'Spartan', serif;#}
+{#        font-size: 1.2rem;#}
+{#    }#}
+
+{#    header.sub {#}
+{#        background: #d9d9d9;#}
+{#        color: #333;#}
+{#        text-align: center;#}
+{#        padding: 1rem;#}
+{#    }#}
+
+{#    header.sub .item {#}
+{#        display: inline-block;#}
+{#        margin-right: 2rem;#}
+{#    }#}
+
+{#    header.sub .item:last-child {#}
+{#        margin-right: 0;#}
+{#    }#}
+
+
+
+
+{#    article.main {#}
+{#        padding-top: 2rem;#}
+{#        margin-left: 33%;#}
+{#        width: 100%;#}
+{#        float: left;#}
+{#    }#}
+
+{#    aside {#}
+{#        position: absolute;#}
+{#        left: 0;#}
+{#        /*background: #e2e3eb;*/#}
+{#        border-right: 1px solid #e9e9e9;#}
+{#        width: 33%;#}
+{#        padding: 2rem;#}
+{#    }#}
+
+{#    aside img {#}
+{#        width: 100%;#}
+{#        margin-top: 0.62rem;#}
+{#        margin-bottom: 1rem;#}
+{#    }#}
+
+{#    aside h3 {#}
+{#        border: none;#}
+{#        margin-bottom: 0.5rem;#}
+{#    }#}
+
+{#    aside p {#}
+{#        margin-bottom: 1rem;#}
+{#        display: block;#}
+{#    }#}
+
+{#    div.main {#}
+{#        margin-left: 33%;#}
+{#        padding: 2rem 2rem 0 2rem;#}
 {#    }#}
 {#</style>#}
-{#<body>#}
-{#<header style="background-color: #595959;">#}
-{#    <img#}
-{#            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/LinkedIn_Logo.svg/1280px-LinkedIn_Logo.svg.png"#}
-{#            style="width: 150px; padding: 20px 20px;"#}
-{#    />#}
+{#<header class="top" style="width:100%;  background-color: #595959; ">#}
+{#    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/LinkedIn_Logo.svg/1280px-LinkedIn_Logo.svg.png" style="width: 100px; padding: 10px 10px;">#}
 {#</header>#}
-{#<div class="entry" style="width:100%">#}
-{#    <div style="padding: 20px 20px; display: inline-block; vertical-align: middle;">#}
-{#        <img src="{{ image }}"style=" width: 170px; " />#}
-{#    </div>#}
-{#    <div#}
-{#            style="display: inline-block; vertical-align: middle; margin-left: 100px;"#}
-{#    >#}
-{#        <span style="font-size: 40px; font-weight: 500;">{{ name }} {{ surname }}</span#}
-{#        ><br />#}
+{#<header class="main">#}
+{#    <h1>{{name}} {{surname}}</h1>#}
+{#</header>#}
 
-{#        <span#}
-{#                style="#}
-{#            font-size: 20px;#}
-{#            font-style: italic;#}
-{#            margin-left: 5px;#}
-{#            margin-top: 20px;#}
-{#          "#}
-{#        >{{ email }}</span#}
-{#        >#}
+{#<header class="sub">#}
+{#    <div class="item">Email: {{email}}</div>#}
+{#</header>#}
 
-{#    </div>#}
-{#</div>#}
-{#<div class="entry">#}
-{#    <div class="summary" style="padding: 20px 20px;">#}
-{#        <div class="title">#}
-{#            <span#}
-{#            ><img#}
-{#                        class="icon"#}
-{#                        src="https://www.freeiconspng.com/uploads/summary-png-icon-3.png"#}
-{#                /></span>#}
-{#            <span>Summary</span>#}
-{#        </div>#}
-{#        <div class="text" style="margin: 10px 10px;">#}
-{#            <span>#}
-{#              I like programming because it never ends. I can make many#}
-{#              different things and still have many new different things to make.#}
-{#              I love the thrill to get it working </span#}
-{#            >#}
-{#        </div>#}
-{#    </div>#}
-{#</div>#}
-{#    <div class="entry">#}
+{#<aside>#}
+{#    <img src="{{image}}" alt="">#}
 
-{#        <div class="experience" style="padding: 20px 20px;">#}
-{#            <div class="title">#}
-{#                <span#}
-{#                ><img#}
-{#                            class="icon"#}
-{#                            src="https://www.freeiconspng.com/uploads/summary-png-icon-3.png"#}
-{#                    /></span>#}
-{#                <span>Experience</span>#}
-{#            </div>#}
-{#            <div class="text" style="margin: 10px 20px;">#}
-{#              <ul>#}
-{#                  {% for job in experiences %}#}
-{#                  <li  style="width:100%;  ">#}
-{#                      <div style="display: inline-block;   vertical-align: middle; color:#595959;">#}
-{#                          <p style="font-size: 20px; font-weight: bold; color: black;">{{job.company}}, </p>#}
-{#                          <p style="font-size: 25px; font-weight: 400;" > {{job.role}}</p>#}
-{#                          <p ><i> {{job.startDate}} - {{ job.endDate }}</i> </p>#}
+{#    <article class="entry">#}
+{#        <h3>Skills</h3>#}
+{#        {% for key, technology in technologies %}#}
+{#            <h4>{{key|capitalize}}</h4>#}
+{#            <p>Google search</p>#}
+{#        {% endfor %}#}
+{#    </article>#}
 
-{#                          <p >{{ job.description }}</p>#}
-{#                      </div>#}
-{#                      <div style="display: inline-block; margin-left: 450px;   vertical-align: middle;">#}
-{#                          <img src="{{ job.image }}" style="width:70px"/>#}
-{#                      </div>#}
+{#    <article class="entry">#}
+{#        <h3>Spoken languages</h3>#}
+{#        <ul>#}
+{#            {% for lang in spoken_languages %}#}
+{#                <li>English – B2</li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    </article>#}
+{#</aside>#}
 
-{#                  </li>#}
-{#                  {% endfor %}#}
-{#              </ul>#}
-{#            </div>#}
-{#        </div>#}
-{#    </div>#}
+{#<div class="main">#}
+{#    <article class="entry">#}
+{#        <h2>{{name}} {{surname}}</h2>#}
+{#        <p>Email: {{email}}</p>#}
+{#    </article>#}
+{#    <article class="entry">#}
+{#        <h3>Short biography</h3>#}
+{#        <p>#}
+{#            I like programming because it never ends. I can make many different things and still have many new different things to make.#}
+{#            I love the thrill to get it working#}
+{#        </p>#}
+{#    </article>#}
 
-{#<div class="entry">#}
+{#    <article class="entry">#}
+{#        <h3>Work experience</h3>#}
+{#        <ul>#}
+{#            {% for job in experiences %}#}
+{#                <li  style="width:100%;  ">#}
 
-{#    <div class="education" style="padding: 20px 20px;">#}
-{#        <div class="title">#}
-{#                <span#}
-{#                ><img#}
-{#                            class="icon"#}
-{#                            src="https://www.freeiconspng.com/uploads/summary-png-icon-3.png"#}
-{#                    /></span>#}
-{#            <span>Education</span>#}
-{#        </div>#}
-{#        <div class="text" style="margin: 10px 20px;">#}
+{#                        <div style="display: inline-block;   vertical-align: middle;">#}
+{#                            <strong>{{job.company}}, {{ job.area }}</strong><br>#}
+{#                            {{job.startDate}} - {{ job.endDate }}<br>#}
+{#                            {{job.role}}<br>#}
+{#                            {{ job.description }}#}
+{#                         </div>#}
+{#                       <div style="display: inline-block; margin-left: 150px;   vertical-align: middle;">#}
+{#                        <img src="{{ job.image }}" style="width:50px"/>#}
+{#                    </div>#}
 
-{#            <ul>#}
-{#                {% for edu in educations %}#}
-{#                    <li  style="width:100%;  ">#}
-{#                        <div style="display: inline-block;   vertical-align: middle; color:#595959;">#}
-{#                            <p style="font-size: 20px; font-weight: bold; color: black;">{{edu.name}}, </p>#}
+{#                </li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    </article>#}
 
-{#                            <p ><i> {{edu.startDate}} </i> </p>#}
 
-{#                            <p >{{ edu.degree }}</p>#}
-{#                        </div>#}
-{#                        <div style="display: inline-block; margin-left: 300px;   vertical-align: middle;">#}
-{#                            <img src="{{ edu.image }}" style="width:70px"/>#}
-{#                        </div>#}
+{#    <article class="entry">#}
+{#        <h3>Education</h3>#}
+{#        <ul>#}
+{#            {% for edu in educations %}#}
+{#                <li style="display: flex; justify-content: space-between; align-items: center">#}
+{#                    <div>#}
+{#                        <strong>#}
+{#                            {{edu.startDate}} - {{ edu.endDate }}<br>#}
+{#                            {{edu.name}}#}
+{#                        </strong> <br>#}
+{#                        {{ edu.degree }}#}
+{#                    </div>#}
+{#                    <div>#}
+{#                        <img src="{{ job.image }}" style="width:100px"/>#}
+{#                    </div>#}
 
-{#                    </li>#}
-{#                {% endfor %}#}
-{#            </ul>#}
-{#        </div>#}
-{#    </div>#}
+{#                </li>#}
+{#            {% endfor %}#}
+{#        </ul>#}
+{#    </article>#}
+
+
+
 {#</div>#}
 
 {#</body>#}
 {#</html>#}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Resume of {{name}}</title>
+</head>
+<style>
+    body {
+        background-color: #ffffff;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'ClearSans', serif;
+        }
+    .entry,
+    header {
+        background-color: #ffffff;
+        margin-bottom: 10px;
+        box-shadow: 1px 5px 8px 0px rgba(153,145,153,1);
+        width:100%;
+    }
+
+    .title span {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 30px;
+        margin-right: 10px;
+        color: #6c7270;
+        font-weight: 400;
+    }
+    .icon {
+        width: 45px;
+    }
+    .text {
+        margin: 20px 10px;
+    }
+    li {
+        list-style-type: none;
+    }
+    p {
+        padding : 5px;
+        margin : 0;
+    }
+</style>
+<body>
+<header style="background-color: #595959;">
+    <img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/LinkedIn_Logo.svg/1280px-LinkedIn_Logo.svg.png"
+            style="width: 150px; padding: 20px 20px;"
+    />
+</header>
+<div class="entry" style="width:100%">
+    <div style="padding: 20px 20px; display: inline-block; vertical-align: middle;">
+        <img src="{{ image }}"style=" width: 170px; " />
+    </div>
+    <div
+            style="display: inline-block; vertical-align: middle; margin-left: 100px;"
+    >
+        <span style="font-size: 40px; font-weight: 500;">{{ name }} {{ surname }}</span
+        ><br />
+
+        <span
+                style="
+            font-size: 20px;
+            font-style: italic;
+            margin-left: 5px;
+            margin-top: 20px;
+          "
+        >{{ email }}</span
+        >
+
+    </div>
+</div>
+<div class="entry">
+    <div class="summary" style="padding: 20px 20px;">
+        <div class="title">
+            <span
+            ><img
+                        class="icon"
+                        src="https://www.freeiconspng.com/uploads/summary-png-icon-3.png"
+                /></span>
+            <span>Summary</span>
+        </div>
+        <div class="text" style="margin: 10px 10px;">
+            <span>
+              I like programming because it never ends. I can make many
+              different things and still have many new different things to make.
+              I love the thrill to get it working </span
+            >
+        </div>
+    </div>
+</div>
+    <div class="entry">
+
+        <div class="experience" style="padding: 20px 20px;">
+            <div class="title">
+                <span
+                ><img
+                            class="icon"
+                            src="https://www.freeiconspng.com/uploads/summary-png-icon-3.png"
+                    /></span>
+                <span>Experience</span>
+            </div>
+            <div class="text" style="margin: 10px 20px;">
+              <ul>
+                  {% for job in experiences %}
+                  <li  style="width:100%;  ">
+                      <div style="display: inline-block;   vertical-align: middle; color:#595959;">
+                          <p style="font-size: 20px; font-weight: bold; color: black;">{{job.company}}, </p>
+                          <p style="font-size: 25px; font-weight: 400;" > {{job.role}}</p>
+                          <p ><i> {{job.startDate}} - {{ job.endDate }}</i> </p>
+
+                          <p >{{ job.description }}</p>
+                      </div>
+                      <div style="display: inline-block; margin-left: 450px;   vertical-align: middle;">
+                          <img src="{{ job.image }}" style="width:70px"/>
+                      </div>
+
+                  </li>
+                  {% endfor %}
+              </ul>
+            </div>
+        </div>
+    </div>
+
+<div class="entry">
+
+    <div class="education" style="padding: 20px 20px;">
+        <div class="title">
+                <span
+                ><img
+                            class="icon"
+                            src="https://www.freeiconspng.com/uploads/summary-png-icon-3.png"
+                    /></span>
+            <span>Education</span>
+        </div>
+        <div class="text" style="margin: 10px 20px;">
+
+            <ul>
+                {% for edu in educations %}
+                    <li  style="width:100%;  ">
+                        <div style="display: inline-block;   vertical-align: middle; color:#595959;">
+                            <p style="font-size: 20px; font-weight: bold; color: black;">{{edu.name}}, </p>
+
+                            <p ><i> {{edu.startDate}} </i> </p>
+
+                            <p >{{ edu.degree }}</p>
+                        </div>
+                        <div style="display: inline-block; margin-left: 300px;   vertical-align: middle;">
+                            <img src="{{ edu.image }}" style="width:70px"/>
+                        </div>
+
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
