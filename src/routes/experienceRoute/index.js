@@ -2,7 +2,7 @@ const express = require("express");
 const ExperienceSchema = require("./../../models/ExperienceSchema");
 const experienceRouter = express.Router();
 const basicAuth = require("basic-auth");
-
+const Json2csvParser = require("json2csv").Parser;
 experienceRouter.get("/:userName/experiences", async (req, res, next) => {
   try {
     const experience = await ExperienceSchema.find({
@@ -44,7 +44,35 @@ experienceRouter.post("/:userName/experiences", async (req, res, next) => {
     next(error);
   }
 });
-
+experienceRouter.post("/:userName/experiences/csv", async (req, res) => {
+  try {
+    const data = await ExperienceSchema.find({ username: req.params.userName });
+    const jsonData = JSON.parse(JSON.stringify(data));
+    console.log(jsonData);
+    const csvFields = [
+      "id",
+      "role",
+      "company",
+      "startDate",
+      "endDate",
+      "description",
+      "area",
+      "username",
+      "createdAt",
+      "updatedAt",
+    ];
+    const json2csvParser = new Json2csvParser({ csvFields });
+    const csvData = json2csvParser.parse(jsonData);
+    res.setHeader(
+      "Content-disposition",
+      "attachment; filename=experiences.csv"
+    );
+    res.set("Content-Type", "text/csv");
+    res.status(200).end(csvData);
+  } catch (e) {
+    console.log(e);
+  }
+});
 experienceRouter.put("/:userName/experiences/:id", async (req, res, next) => {
   try {
     const user = basicAuth(req);
@@ -83,7 +111,8 @@ experienceRouter.delete(
       if (user.name !== data.username) res.status(403).send("unauthorized");
       else {
         const experience = await ExperienceSchema.findByIdAndDelete(
-          req.params.id
+          req.params.id,
+          { ...req.body, username: user.username }
         );
 
         if (experience) {

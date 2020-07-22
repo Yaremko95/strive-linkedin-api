@@ -2,15 +2,17 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const dotenv = require("dotenv");
+
 const mongoose = require("mongoose");
 const authorize = require("./utils/auth");
 const postsRouter = require("./routes/postsRoute");
 const experienceRouter = require("./routes/experienceRoute");
-const profileRouter = require("./routes/profileRoute");
+const profileRouter = require("./routes/profilesRoute");
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
 
 makeDirectory();
+
 dotenv.config();
 const app = express();
 global.appRoot = __dirname;
