@@ -2,14 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const dotenv = require("dotenv");
-
+const listEndpoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
 const authorize = require("./utils/auth");
 const postsRouter = require("./routes/postsRoute");
 const experienceRouter = require("./routes/experienceRoute");
-
+const commentsRouter = require("./routes/comments");
 const profilesRouter = require("./routes/profilesRoute");
-
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
 
@@ -30,7 +29,8 @@ app.use("/profile", authorize, profilesRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);
-
+app.use("/comments", authorize, commentsRouter);
+console.log(listEndpoints(app));
 mongoose
   .connect(process.env.MONGOHOST, {
     useNewUrlParser: true,
