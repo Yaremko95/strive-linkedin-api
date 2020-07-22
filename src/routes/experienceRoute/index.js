@@ -34,9 +34,12 @@ experienceRouter.get("/:userName/experiences/:id", async (req, res, next) => {
 experienceRouter.post("/:userName/experiences", async (req, res, next) => {
   try {
     const user = basicAuth(req);
-    if (user.name !== req.body.username) res.status(403).send("unauthorized");
+    if (user.name !== req.params.userName) res.status(403).send("unauthorized");
     else {
-      const newExperience = new ExperienceSchema(req.body);
+      const newExperience = new ExperienceSchema({
+        ...req.body,
+        username: user.name,
+      });
       const { _id } = await newExperience.save();
       res.status(200).send(_id);
     }
