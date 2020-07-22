@@ -24,7 +24,7 @@ app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);
 app.use('/posts', authorize,  postsRouter)
-app.use('/experience',  experienceRouter)
+
 
 mongoose
   .connect(process.env.MONGOHOST, {
