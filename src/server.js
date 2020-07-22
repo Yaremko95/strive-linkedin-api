@@ -15,6 +15,11 @@ makeDirectory();
 
 dotenv.config();
 const app = express();
+app.set("twig options", {
+  strict_variables: false,
+  cache: false,
+  auto_reload: true,
+});
 global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());

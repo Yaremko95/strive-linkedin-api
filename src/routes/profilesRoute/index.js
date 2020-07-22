@@ -5,6 +5,7 @@ const multer = require("multer");
 const q2m = require("query-to-mongo");
 const fs = require("fs").promises;
 const { join } = require("path");
+const getPdf = require("../../utils/generatePdf/getPdf");
 const router = express.Router();
 const upload = multer();
 
@@ -35,11 +36,56 @@ profilesRouter.get("/", async (req, res, next) => {
 profilesRouter.get("/:username", async (req, res, next) => {
   try {
     const username = req.params.username;
-    const profile = await ProfileSchema.findById(username);
+    const profile = await ProfileSchema.findOne({
+      username: req.params.username,
+    });
     res.send(profile);
   } catch (error) {
     console.log(error);
     next("While reading profiles list a problem occurred!");
+  }
+});
+
+profilesRouter.get("/:username/pdf", async (req, res, next) => {
+  try {
+    await ProfileSchema.aggregate([
+      { $match: { username: req.params.username } },
+      {
+        $lookup: {
+          from: "experiences",
+          localField: "username",
+          foreignField: "username",
+          as: "experiences",
+        },
+      },
+      {
+        $lookup: {
+          from: "educations",
+          localField: "username",
+          foreignField: "username",
+          as: "educations",
+        },
+      },
+    ]).exec(async (err, user) => {
+      if (err) {
+        next(err);
+      }
+      user[0].experiences.forEach((time) => {
+        time.startDate = new Date(time.startDate).getFullYear();
+        if (time.endDate) time.endDate = new Date(time.endDate).getFullYear();
+      });
+      user[0].educations.forEach((time) => {
+        time.startDate = new Date(time.startDate).getFullYear();
+        if (time.endDate) time.endDate = new Date(time.endDate).getFullYear();
+      });
+
+      const pdf = await getPdf(user[0], (stream) => {
+        res.set("Content-type", "application/pdf");
+        stream.pipe(res);
+      });
+    });
+  } catch (e) {
+    console.log(e);
   }
 });
 
