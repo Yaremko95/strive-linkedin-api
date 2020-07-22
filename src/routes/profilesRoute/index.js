@@ -90,7 +90,7 @@ profilesRouter.get("/:username/pdf", async (req, res, next) => {
 });
 
 profilesRouter.post("/", async (req, res, next) => {
-   try {
+  try {
     console.log(req.body);
     const user = basicAuth(req);
     const newProfile = await new ProfileSchema({
@@ -104,7 +104,6 @@ profilesRouter.post("/", async (req, res, next) => {
     next(error);
   }
 });
-
 
 profilesRouter.put("/:username", async (req, res, next) => {
   try {
@@ -157,39 +156,38 @@ profilesRouter.delete("/:username", async (req, res, next) => {
   }
 });
 
-
-router.route("/:profileId").post(upload.single("post"), async (req, res) => {
+profilesRouter
+  .route("/:profileId")
+  .post(upload.single("post"), async (req, res) => {
     try {
-        const profile = await ProfileSchema.findById(req.params.profileId);
-        const user = basicAuth(req);
-        if (profile) {
-            if (profile.username === user.name) {
-                const [filename, extension] = req.file.mimetype.split("/");
-                await fs.writeFile(
-                    join(profilesDirectory, `${req.params.profileId}.${extension}`),
-                    req.file.buffer
-                );
+      const profile = await ProfileSchema.findById(req.params.profileId);
+      const user = basicAuth(req);
+      if (profile) {
+        if (profile.username === user.name) {
+          const [filename, extension] = req.file.mimetype.split("/");
+          await fs.writeFile(
+            join(profilesDirectory, `${req.params.profileId}.${extension}`),
+            req.file.buffer
+          );
 
-                let url = `${req.protocol}://${req.host}${
-                    process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-                    }/static/profiles/${req.params.profileId}.${extension}`;
-                await ProfileSchema.findByIdAndUpdate(req.params.profileId, {
-
-                    image: url,
-                    username: user.name,
-                });
-                res.status(200).send("ok");
-            } else {
-                res.status(403).send("unauthorised");
-            }
+          let url = `${req.protocol}://${req.host}${
+            process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
+          }/static/profiles/${req.params.profileId}.${extension}`;
+          await ProfileSchema.findByIdAndUpdate(req.params.profileId, {
+            image: url,
+            username: user.name,
+          });
+          res.status(200).send("ok");
         } else {
-            res.status(404).send("not found");
+          res.status(403).send("unauthorised");
         }
+      } else {
+        res.status(404).send("not found");
+      }
     } catch (e) {
-        console.log(e);
-        res.status(500).send("bad request");
+      console.log(e);
+      res.status(500).send("bad request");
     }
-});
+  });
 
-module.exports = profilesRouter
-
+module.exports = profilesRouter;
