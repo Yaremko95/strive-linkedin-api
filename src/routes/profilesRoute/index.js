@@ -105,7 +105,7 @@ profilesRouter.post("/", async (req, res, next) => {
   }
 });
 
-profilesRouter.put("/", async (req, res, next) => {
+profilesRouter.put("/:username", async (req, res, next) => {
   try {
     const user = basicAuth(req);
     if (user.name !== req.params.username) res.status(403).send("unauthorized");
