@@ -158,7 +158,7 @@ profilesRouter.delete("/:username", async (req, res, next) => {
 
 profilesRouter
   .route("/:profileId")
-  .post(upload.single("post"), async (req, res) => {
+  .post(upload.single("profile"), async (req, res) => {
     try {
       const profile = await ProfileSchema.findById(req.params.profileId);
       const user = basicAuth(req);
