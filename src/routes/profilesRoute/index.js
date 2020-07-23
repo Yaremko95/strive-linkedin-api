@@ -100,7 +100,6 @@ profilesRouter.post("/", async (req, res, next) => {
     const user = basicAuth(req);
     const newProfile = await new ProfileSchema({
       ...req.body,
-      username: user.name,
     });
     const result = await newProfile.save();
     console.log(result);
