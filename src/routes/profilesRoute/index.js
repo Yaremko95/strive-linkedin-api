@@ -8,12 +8,13 @@ const { join } = require("path");
 const getPdf = require("../../utils/generatePdf/getPdf");
 const router = express.Router();
 const upload = multer();
+const authorization = require("../../utils/auth");
 
 const profilesDirectory = join(__dirname, "../../public/profiles");
 
 const profilesRouter = express.Router();
 
-profilesRouter.get("/", async (req, res, next) => {
+profilesRouter.get("/", authorization, async (req, res, next) => {
   try {
     const query = q2m(req.query);
     const profiles = await ProfileSchema.find(
@@ -25,7 +26,10 @@ profilesRouter.get("/", async (req, res, next) => {
       .sort(query.options.sort);
 
     res.send({
-      data: profiles,
+      data: profiles.map((profile) => {
+        profile.password = "";
+        return profile;
+      }),
       total: profiles.length,
     });
   } catch (error) {
@@ -33,20 +37,20 @@ profilesRouter.get("/", async (req, res, next) => {
   }
 });
 
-profilesRouter.get("/:username", async (req, res, next) => {
+profilesRouter.get("/:username", authorization, async (req, res, next) => {
   try {
     const username = req.params.username;
     const profile = await ProfileSchema.findOne({
       username: req.params.username,
     });
-    res.send(profile);
+    res.send({ profile, username: "" });
   } catch (error) {
     console.log(error);
     next("While reading profiles list a problem occurred!");
   }
 });
 
-profilesRouter.get("/:username/pdf", async (req, res, next) => {
+profilesRouter.get("/:username/pdf", authorization, async (req, res, next) => {
   try {
     await ProfileSchema.aggregate([
       { $match: { username: req.params.username } },
@@ -70,6 +74,7 @@ profilesRouter.get("/:username/pdf", async (req, res, next) => {
       if (err) {
         next(err);
       }
+      user.password = "";
       user[0].experiences.forEach((time) => {
         time.startDate = new Date(time.startDate).getFullYear();
         if (time.endDate) time.endDate = new Date(time.endDate).getFullYear();
@@ -105,7 +110,7 @@ profilesRouter.post("/", async (req, res, next) => {
   }
 });
 
-profilesRouter.put("/:username", async (req, res, next) => {
+profilesRouter.put("/:username", authorization, async (req, res, next) => {
   try {
     const user = basicAuth(req);
     if (user.name !== req.params.username) res.status(403).send("unauthorized");
@@ -133,7 +138,7 @@ profilesRouter.put("/:username", async (req, res, next) => {
   }
 });
 
-profilesRouter.delete("/:username", async (req, res, next) => {
+profilesRouter.delete("/:username", authorization, async (req, res, next) => {
   try {
     const user = basicAuth(req);
     if (user.name !== req.params.username) res.status(403).send("unauthorized");
@@ -166,7 +171,12 @@ profilesRouter.route("/login").post(async (req, res, next) => {
         console.log(user);
         user.comparePassword(reqUser.pass, function (err, isMatch) {
           if (err) throw new Error(err);
-          if (isMatch) res.send(user);
+          if (isMatch)
+            res.send({
+              _id: user._id,
+              username: user.username,
+              password: user.password,
+            });
           else next("Incorrect username or password");
         });
       }
@@ -177,7 +187,7 @@ profilesRouter.route("/login").post(async (req, res, next) => {
 });
 profilesRouter
   .route("/:profileId")
-  .post(upload.single("profile"), async (req, res) => {
+  .post(upload.single("profile"), authorization, async (req, res) => {
     try {
       const profile = await ProfileSchema.findById(req.params.profileId);
       const user = basicAuth(req);
@@ -199,6 +209,7 @@ profilesRouter
               username: user.name,
             }
           );
+          result.password = "";
           res.status(200).send(result);
         } else {
           res.status(403).send("unauthorised");

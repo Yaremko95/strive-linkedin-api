@@ -40,7 +40,12 @@ router
         if (err) {
           next(err);
         }
-        res.send(posts);
+        res.send(
+          posts.map((post) => {
+            post.user.password = "";
+            return post;
+          })
+        );
       });
     } catch (e) {
       console.log(e);
