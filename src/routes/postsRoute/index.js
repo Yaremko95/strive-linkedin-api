@@ -147,7 +147,7 @@ router.route("/:postId").post(upload.single("post"), async (req, res) => {
           username: user.name,
         });
         console.log(result);
-        res.status(200).send();
+        res.status(200).send(result);
       } else {
         res.status(403).send("unauthorised");
       }
