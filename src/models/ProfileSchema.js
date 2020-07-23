@@ -1,9 +1,7 @@
 const { Schema } = require("mongoose");
 const mongoose = require("mongoose");
 const v = require("validator");
-
-const UserModel = require("./AuthSchema");
-
+const bcrypt = require("bcrypt");
 const ProfileSchema = new Schema(
   {
     name: {
@@ -11,6 +9,16 @@ const ProfileSchema = new Schema(
       required: true,
     },
     surname: {
+      type: String,
+      required: true,
+    },
+    bio: {
+      type: String,
+    },
+    title: {
+      type: String,
+    },
+    password: {
       type: String,
       required: true,
     },
@@ -23,7 +31,7 @@ const ProfileSchema = new Schema(
           if (!v.isEmail(value)) {
             throw new Error("Email is invalid");
           } else {
-            const checkEmail = await UserModel.findOne({ email: value });
+            const checkEmail = await ProfileModel.findOne({ email: value });
             if (checkEmail) {
               throw new Error("Email already existant!");
             }
@@ -32,26 +40,43 @@ const ProfileSchema = new Schema(
       },
       area: {
         type: String,
-        required: true,
       },
     },
     image: {
       type: String,
-      required: true,
     },
     username: {
       type: String,
       required: true,
-      validator: async (value) => {
-        const checkUsername = await UserModel.findOne({ username: value });
-        if (checkUsername) {
-          throw new Error("Username already existant!");
-        }
+      validate: {
+        validator: async (value) => {
+          const checkUsername = await ProfileModel.findOne({ username: value });
+          if (checkUsername) {
+            throw new Error("Username already existant!");
+          }
+        },
       },
     },
   },
   { timestamps: true }
 );
+ProfileSchema.pre("save", async function preSave(next) {
+  const user = this;
+  if (!user.isModified("password")) next();
+  else {
+    try {
+      const hash = await bcrypt.hash(user.password, 12);
+      user.password = hash;
+    } catch (e) {
+      next(e);
+    }
+  }
+});
 
+ProfileSchema.methods.comparePassword = async function comparePassword(
+  candidate
+) {
+  return bcrypt.compare(candidate, this.password);
+};
 const ProfileModel = mongoose.model("Profile", ProfileSchema);
 module.exports = ProfileModel;

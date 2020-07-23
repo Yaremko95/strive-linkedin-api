@@ -98,7 +98,7 @@ profilesRouter.post("/", async (req, res, next) => {
       username: user.name,
     });
     const result = await newProfile.save();
-
+    console.log(result);
     res.status(201).send(result);
   } catch (error) {
     next(error);
