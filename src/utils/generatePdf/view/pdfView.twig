@@ -51,17 +51,17 @@
 <header style="background-color: #595959;">
     <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/LinkedIn_Logo.svg/1280px-LinkedIn_Logo.svg.png"
-            style="width: 150px; padding: 20px 20px;"
+            style="width: 100px; padding: 20px 20px;"
     />
 </header>
 <div class="entry" style="width:100%">
     <div style="padding: 20px 20px; display: inline-block; vertical-align: middle;">
-        <img src="{{ image }}"style=" width: 170px; " />
+        <img src="{{ image }}"style=" width: 90px; " />
     </div>
     <div
-            style="display: inline-block; vertical-align: middle; margin-left: 100px;"
+            style="display: inline-block; vertical-align: middle; margin-left: 90px;"
     >
-        <span style="font-size: 40px; font-weight: 500;">{{ name }} {{ surname }}</span
+        <span style="font-size: 20px; font-weight: 500;">{{ name }} {{ surname }}</span
         ><br />
 
         <span
@@ -111,8 +111,8 @@
                   {% for job in experiences %}
                   <li  style="width:100%;  ">
                       <div style="display: inline-block;   vertical-align: middle; color:#595959;">
-                          <p style="font-size: 20px; font-weight: bold; color: black;">{{job.company}}, </p>
-                          <p style="font-size: 25px; font-weight: 400;" > {{job.role}}</p>
+                          <p style="font-size: 15px; font-weight: bold; color: black;">{{job.company}}, </p>
+                          <p style="font-size: 15px; font-weight: 400;" > {{job.role}}</p>
                           <p ><i> {{job.startDate}} - {{ job.endDate }}</i> </p>
 
                           <p >{{ job.description }}</p>
@@ -145,13 +145,13 @@
                 {% for edu in educations %}
                     <li  style="width:100%;  ">
                         <div style="display: inline-block;   vertical-align: middle; color:#595959;">
-                            <p style="font-size: 20px; font-weight: bold; color: black;">{{edu.name}}, </p>
+                            <p style="font-size: 15px; font-weight: bold; color: black;">{{edu.name}}, </p>
 
                             <p ><i> {{edu.startDate}} </i> </p>
 
                             <p >{{ edu.degree }}</p>
                         </div>
-                        <div style="display: inline-block; margin-left: 300px;   vertical-align: middle;">
+                        <div style="display: inline-block; margin-left: 450px;   vertical-align: middle;">
                             <img src="{{ edu.image }}" style="width:70px"/>
                         </div>
 
