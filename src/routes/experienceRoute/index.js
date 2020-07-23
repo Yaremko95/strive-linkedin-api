@@ -40,8 +40,8 @@ experienceRouter.post("/:userName/experiences", async (req, res, next) => {
         ...req.body,
         username: user.name,
       });
-      const { _id } = await newExperience.save();
-      res.status(200).send(_id);
+      const result = await newExperience.save();
+      res.status(200).send(result);
     }
   } catch (error) {
     next(error);
@@ -90,7 +90,7 @@ experienceRouter.put("/:userName/experiences/:id", async (req, res, next) => {
         }
       );
       if (experience) {
-        res.status(200).send("Ok");
+        res.status(200).send(experience);
       } else {
         const error = new Error(
           `Experience with id: ${req.params.id} was not found`

@@ -29,8 +29,8 @@ router
       const user = basicAuth(req);
       if (user.name !== req.body.username) res.status(403).send("unauthorized");
       else {
-        await new EducationModel({ ...req.body }).save();
-        res.status(200).send("ok");
+        const result = await new EducationModel({ ...req.body }).save();
+        res.status(200).send(result);
       }
     } catch (e) {
       console.log(e);
@@ -82,7 +82,7 @@ router
           ...req.body,
           username: user.name,
         });
-        if (result) res.status(200).send("ok");
+        if (result) res.status(200).send(result);
         else res.status(404).send("not found");
       }
     } catch (e) {

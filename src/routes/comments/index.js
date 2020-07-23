@@ -7,12 +7,12 @@ const router = express.Router();
 router.route("/").post(async (req, res) => {
   try {
     const user = basicAuth(req);
-    await new CommentModel({
+    const result = await new CommentModel({
       ...req.body,
 
       author: user.name,
     }).save();
-    res.status(200).send("ok");
+    res.status(200).send(result);
   } catch (e) {
     res.status(500).send(e);
   }

@@ -97,9 +97,9 @@ profilesRouter.post("/", async (req, res, next) => {
       ...req.body,
       username: user.name,
     });
-    const { _id } = await newProfile.save();
+    const result = await newProfile.save();
 
-    res.status(201).send(_id);
+    res.status(201).send(result);
   } catch (error) {
     next(error);
   }
@@ -119,7 +119,7 @@ profilesRouter.put("/:username", async (req, res, next) => {
         { runValidators: true }
       );
       if (profile) {
-        res.send("Ok");
+        res.send(profile);
       } else {
         const error = new Error(
           `Profile with username ${req.params.username} not found`
@@ -173,11 +173,14 @@ profilesRouter
           let url = `${req.protocol}://${req.host}${
             process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
           }/static/profiles/${req.params.profileId}.${extension}`;
-          await ProfileSchema.findByIdAndUpdate(req.params.profileId, {
-            image: url,
-            username: user.name,
-          });
-          res.status(200).send("ok");
+          const result = await ProfileSchema.findByIdAndUpdate(
+            req.params.profileId,
+            {
+              image: url,
+              username: user.name,
+            }
+          );
+          res.status(200).send(result);
         } else {
           res.status(403).send("unauthorised");
         }
