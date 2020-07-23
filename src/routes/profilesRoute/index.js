@@ -43,7 +43,7 @@ profilesRouter.get("/:username", authorization, async (req, res, next) => {
     const profile = await ProfileSchema.findOne({
       username: req.params.username,
     });
-    res.send({ profile, username: "" });
+    res.send({ ...profile, username: "" });
   } catch (error) {
     console.log(error);
     next("While reading profiles list a problem occurred!");
