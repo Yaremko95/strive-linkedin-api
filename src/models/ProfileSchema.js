@@ -74,9 +74,13 @@ ProfileSchema.pre("save", async function preSave(next) {
 });
 
 ProfileSchema.methods.comparePassword = async function comparePassword(
-  candidate
+  candidate,
+  callback
 ) {
-  return bcrypt.compare(candidate, this.password);
+  bcrypt.compare(candidate, this.password, function (err, isMatch) {
+    if (err) return callback(err);
+    callback(null, isMatch);
+  });
 };
 const ProfileModel = mongoose.model("Profile", ProfileSchema);
 module.exports = ProfileModel;

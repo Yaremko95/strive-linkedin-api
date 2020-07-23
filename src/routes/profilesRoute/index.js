@@ -156,6 +156,25 @@ profilesRouter.delete("/:username", async (req, res, next) => {
   }
 });
 //commetn
+profilesRouter.route("/login").post(async (req, res, next) => {
+  try {
+    const reqUser = basicAuth(req);
+    const user = await ProfileSchema.findOne(
+      { username: reqUser.name },
+      (err, user) => {
+        if (err) throw new Error(err);
+        console.log(user);
+        user.comparePassword(reqUser.pass, function (err, isMatch) {
+          if (err) throw new Error(err);
+          if (isMatch) res.send(user);
+          else next("Incorrect username or password");
+        });
+      }
+    );
+  } catch (e) {
+    next(e);
+  }
+});
 profilesRouter
   .route("/:profileId")
   .post(upload.single("profile"), async (req, res) => {

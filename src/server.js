@@ -25,7 +25,7 @@ global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(cors());
 app.use(express.json());
-app.use("/profile", authorize, profilesRouter);
+app.use("/profile", profilesRouter);
 app.use("/profile", authorize, educationRouter);
 app.use("/profile", experienceRouter);
 app.use("/posts", authorize, postsRouter);
@@ -34,7 +34,7 @@ console.log(listEndpoints(app));
 mongoose
   .connect(process.env.MONGOHOST, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: false,
   })
   .then(
     app.listen(process.env.PORT, () => {
