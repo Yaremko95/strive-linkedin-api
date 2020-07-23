@@ -11,7 +11,7 @@
     body {
         color: #123;
         background: #fff;
-        font-size: 16px;
+        font-size: 10px;
         text-rendering: optimize-speed;
     }
 
@@ -66,7 +66,7 @@
         margin-bottom: 1rem;
         border-bottom: 1px solid #ccc;
         display: block;
-        font-size: 1.5rem;
+        font-size: 1.2rem;
     }
 
     h4 {
@@ -81,47 +81,6 @@
      * CV HEADER
      ************************/
 
-    header.main {
-        color: #333;
-        /*padding: 0rem 0 2rem 0;*/
-
-        background-size: cover;
-        text-align: center;
-    }
-    header h1 {
-        font-size: 3rem;
-        padding: 2rem 2rem 1rem 2rem;
-        margin-bottom: 2.25rem;
-        border: 3px solid #333;
-        letter-spacing: 0.62rem;
-        display: inline-block;
-        text-transform: uppercase;
-        font-family: 'Spartan', serif;
-    }
-
-    header h2 {
-        display: block;
-        position: relative;
-        margin: 0rem 0;
-        font-family: 'Spartan', serif;
-        font-size: 1.2rem;
-    }
-
-    header.sub {
-        background: #d9d9d9;
-        color: #333;
-        text-align: center;
-        padding: 1rem;
-    }
-
-    header.sub .item {
-        display: inline-block;
-        margin-right: 2rem;
-    }
-
-    header.sub .item:last-child {
-        margin-right: 0;
-    }
 
 
 
@@ -166,31 +125,25 @@
 <header class="top" style="width:100%;  background-color: #595959; ">
     <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/LinkedIn_Logo.svg/1280px-LinkedIn_Logo.svg.png" style="width: 100px; padding: 10px 10px;">
 </header>
-<header class="main">
-    <h1>{{name}} {{surname}}</h1>
-</header>
 
-<header class="sub">
-    <div class="item">Email: {{email}}</div>
-</header>
 
 <aside>
     <img src="{{image}}" alt="">
 
     <article class="entry">
         <h3>Skills</h3>
-        {% for key, technology in technologies %}
-            <h4>{{key|capitalize}}</h4>
+
+
             <p>Google search</p>
-        {% endfor %}
+
     </article>
 
     <article class="entry">
         <h3>Spoken languages</h3>
         <ul>
-            {% for lang in spoken_languages %}
+
                 <li>English – B2</li>
-            {% endfor %}
+
         </ul>
     </article>
 </aside>
@@ -220,9 +173,7 @@
                             {{job.role}}<br>
                             {{ job.description }}
                          </div>
-                       <div style="display: inline-block; margin-left: 150px;   vertical-align: middle;">
-                        <img src="{{ job.image }}" style="width:50px"/>
-                    </div>
+
 
                 </li>
             {% endfor %}
@@ -242,9 +193,7 @@
                         </strong> <br>
                         {{ edu.degree }}
                     </div>
-                    <div>
-                        <img src="{{ edu.image }}" style="width:100px"/>
-                    </div>
+
 
                 </li>
             {% endfor %}
