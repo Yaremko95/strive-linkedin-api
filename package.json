@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "v14.2.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/server.js"
+    "dev": "nodemon ./src/server.js",
+    "start": "node ./src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -13,10 +17,13 @@
   "dependencies": {
     "@root/mkdirp": "^1.0.0",
     "basic-auth": "^2.0.1",
+    "bcrypt": "^5.0.0",
     "cors": "^2.8.5",
+    "cors-anywhere": "^0.4.3",
     "csv-stringify": "^5.5.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-list-endpoints": "^5.0.0",
     "html-pdf": "^2.2.0",
     "json2csv": "^5.0.1",
     "mongoose": "^5.9.25",

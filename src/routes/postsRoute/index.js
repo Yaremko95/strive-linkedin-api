@@ -40,7 +40,12 @@ router
         if (err) {
           next(err);
         }
-        res.send(posts);
+        res.send(
+          posts.map((post) => {
+            post.user.password = "";
+            return post;
+          })
+        );
       });
     } catch (e) {
       console.log(e);
@@ -59,8 +64,9 @@ router
           image: imageUrl,
           username: user.name,
         });
-        await result.save();
-        res.send("ok");
+        const data = await result.save();
+
+        res.send(data);
       } else {
         throw new Error();
       }
@@ -90,11 +96,11 @@ router
       const user = basicAuth(req);
       if (post) {
         if (post.username === user.name) {
-          await PostSchema.findByIdAndUpdate(req.params.id, {
+          const result = await PostSchema.findByIdAndUpdate(req.params.id, {
             ...req.body,
             username: user.name,
           });
-          res.status(200).send("ok");
+          res.status(200).send(result);
         } else {
           res.status(403).send("unauthorised");
         }
@@ -140,13 +146,13 @@ router.route("/:postId").post(upload.single("post"), async (req, res) => {
 
         let url = `${req.protocol}://${req.host}${
           process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-          }/static/posts/${req.params.postId}.${extension}`;
-        await PostSchema.findByIdAndUpdate(req.params.postId, {
-
+        }/static/posts/${req.params.postId}.${extension}`;
+        const result = await PostSchema.findByIdAndUpdate(req.params.postId, {
           image: url,
           username: user.name,
         });
-        res.status(200).send("ok");
+        console.log(result);
+        res.status(200).send(result);
       } else {
         res.status(403).send("unauthorised");
       }
