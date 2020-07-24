@@ -181,6 +181,7 @@ profilesRouter.route("/login").post(async (req, res, next) => {
             _id: user._id,
             username: user.username,
             password: user.password,
+            image: user.image,
           });
         else next("Incorrect username or password");
       });
