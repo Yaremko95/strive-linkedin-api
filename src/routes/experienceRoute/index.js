@@ -3,6 +3,11 @@ const ExperienceSchema = require("./../../models/ExperienceSchema");
 const experienceRouter = express.Router();
 const basicAuth = require("basic-auth");
 const Json2csvParser = require("json2csv").Parser;
+const { join } = require("path");
+const multer = require("multer");
+const fs = require("fs").promises;
+const upload = multer();
+const expDir = join(__dirname, "../../public/expPictures");
 experienceRouter.get("/:userName/experiences", async (req, res, next) => {
   try {
     const experience = await ExperienceSchema.find({
@@ -133,5 +138,40 @@ experienceRouter.delete(
     }
   }
 );
-
+experienceRouter
+  .route("/:userName/experiences/:id/picture")
+  .post(upload.single("picture"), async (req, res) => {
+    try {
+      console.log(req.body);
+      const item = await ExperienceSchema.findById(req.params.id);
+      const user = basicAuth(req);
+      if (item) {
+        if (item.username === user.name) {
+          const [filename, extension] = req.file.mimetype.split("/");
+          await fs.writeFile(
+            join(expDir, `${req.params.id}.${extension}`),
+            req.file.buffer
+          );
+          let url = `${req.protocol}://${req.host}${
+            process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
+          }/static/expPictures/${req.params.id}.${extension}`;
+          const result = await ExperienceSchema.findByIdAndUpdate(
+            req.params.id,
+            {
+              image: url,
+              username: user.name,
+            }
+          );
+          res.status(200).send(result);
+        } else {
+          res.status(403).send("unauthorised");
+        }
+      } else {
+        res.status(404).send("not found");
+      }
+    } catch (e) {
+      console.log(e);
+      res.status(500).send("bad request");
+    }
+  });
 module.exports = experienceRouter;

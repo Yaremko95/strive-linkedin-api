@@ -4,6 +4,7 @@ const createDirectories = () => {
   let postsdir = join(__dirname, "../", "public/posts");
   let profilesDir = join(__dirname, "../", "public/profiles");
   let eduDir = join(__dirname, "../", "public/eduDir");
+  let expDir = join(__dirname, "../", "public/expPictures");
 
   mkdir(postsdir, function (error) {
     if (error) {
@@ -22,6 +23,12 @@ const createDirectories = () => {
       throw error;
     }
     console.log(eduDir);
+  });
+  mkdir(expDir, function (error) {
+    if (error) {
+      throw error;
+    }
+    console.log(expDir);
   });
 };
 

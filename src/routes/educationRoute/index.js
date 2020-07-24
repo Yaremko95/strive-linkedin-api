@@ -27,7 +27,8 @@ router
   .post(async (req, res) => {
     try {
       const user = basicAuth(req);
-      if (user.name !== req.req.username) res.status(403).send("unauthorized");
+      if (user.name !== req.params.userName)
+        res.status(403).send("unauthorized");
       else {
         const result = await new EducationModel({
           ...req.body,
@@ -125,11 +126,11 @@ router
           let url = `${req.protocol}://${req.host}${
             process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
           }/static/eduPictures/${req.params.id}.${extension}`;
-          await EducationModel.findByIdAndUpdate(req.params.id, {
+          const result = await EducationModel.findByIdAndUpdate(req.params.id, {
             image: url,
             username: user.name,
           });
-          res.status(200).send("ok");
+          res.status(200).send(result);
         } else {
           res.status(403).send("unauthorised");
         }
