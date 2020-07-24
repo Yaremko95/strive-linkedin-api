@@ -168,25 +168,23 @@ profilesRouter.delete("/:username", authorization, async (req, res, next) => {
 //commetn
 profilesRouter.route("/login").post(async (req, res, next) => {
   try {
-    console.log(req);
     const reqUser = basicAuth(req);
-    const user = await ProfileSchema.findOne(
-      { username: reqUser.name },
-      (err, user) => {
+    console.log(reqUser);
+
+    await ProfileSchema.findOne({ username: reqUser.name }, (err, user) => {
+      if (err) throw new Error(err);
+      console.log(user);
+      user.comparePassword(reqUser.pass, function (err, isMatch) {
         if (err) throw new Error(err);
-        console.log(user);
-        user.comparePassword(reqUser.pass, function (err, isMatch) {
-          if (err) throw new Error(err);
-          if (isMatch)
-            res.send({
-              _id: user._id,
-              username: user.username,
-              password: user.password,
-            });
-          else next("Incorrect username or password");
-        });
-      }
-    );
+        if (isMatch)
+          res.send({
+            _id: user._id,
+            username: user.username,
+            password: user.password,
+          });
+        else next("Incorrect username or password");
+      });
+    });
   } catch (e) {
     next(e);
   }
