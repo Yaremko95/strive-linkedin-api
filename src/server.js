@@ -16,6 +16,7 @@ makeDirectory();
 
 dotenv.config();
 const app = express();
+app.use(cors());
 app.set("twig options", {
   strict_variables: false,
   cache: false,
