@@ -13,7 +13,7 @@ const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
 
 const allowedOrigins = [
-  "http://localhost:3006",
+  "http://localhost:3000",
   "https://agile-brushlands-83006.herokuapp.com/",
 ];
 
@@ -21,7 +21,7 @@ makeDirectory();
 
 dotenv.config();
 const app = express();
-app.use(cors());
+
 app.set("twig options", {
   strict_variables: false,
   cache: false,
@@ -30,20 +30,20 @@ app.set("twig options", {
 global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
 app.use(
-    cors({
-        origin: function (origin, callback) {
-            // allow requests with no origin
-            // (like mobile apps or curl requests)
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.indexOf(origin) === -1) {
-                const msg =
-                    "The CORS policy for this site does not " +
-                    "allow access from the specified Origin.";
-                return callback(new Error(msg), false);
-            }
-            return callback(null, true);
-        },
-    })
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin
+      // (like mobile apps or curl requests)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg =
+          "The CORS policy for this site does not " +
+          "allow access from the specified Origin.";
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
+  })
 );
 app.use(express.json());
 app.use("/profile", profilesRouter);
