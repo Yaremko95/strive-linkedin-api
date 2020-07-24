@@ -26,18 +26,18 @@ const ProfileSchema = new Schema(
       type: String,
       required: true,
       lowercase: true,
-      validate: {
-        validator: async (value) => {
-          if (!v.isEmail(value)) {
-            throw new Error("Email is invalid");
-          } else {
-            const checkEmail = await ProfileModel.findOne({ email: value });
-            if (checkEmail) {
-              throw new Error("Email already existant!");
-            }
-          }
-        },
-      },
+      // validate: {
+      //   validator: async (value) => {
+      //     if (!v.isEmail(value)) {
+      //       throw new Error("Email is invalid");
+      //     } else {
+      //       const checkEmail = await ProfileModel.findOne({ email: value });
+      //       if (checkEmail) {
+      //         throw new Error("Email already existant!");
+      //       }
+      //     }
+      //   },
+      // },
       area: {
         type: String,
       },
@@ -48,14 +48,14 @@ const ProfileSchema = new Schema(
     username: {
       type: String,
       required: true,
-      validate: {
-        validator: async (value) => {
-          const checkUsername = await ProfileModel.findOne({ username: value });
-          if (checkUsername) {
-            throw new Error("Username already existant!");
-          }
-        },
-      },
+      // validate: {
+      //   validator: async (value) => {
+      //     const checkUsername = await ProfileModel.findOne({ username: value });
+      //     if (checkUsername) {
+      //       throw new Error("Username already existant!");
+      //     }
+      //   },
+      // },
     },
   },
   { timestamps: true }
@@ -71,6 +71,32 @@ ProfileSchema.pre("save", async function preSave(next) {
       next(e);
     }
   }
+});
+
+ProfileSchema.pre("findOneAndUpdate", async function preUpdate(next) {
+  const user = this;
+
+  try {
+    console.log(this);
+    const hash = await bcrypt.hash(user._update.password, 12);
+    this.update({ password: hash });
+
+    next();
+  } catch (e) {
+    next(e);
+  }
+  //}
+});
+
+ProfileSchema.pre("validate", async function preValidate(next) {
+  const user = this;
+  const checkUsername = await ProfileModel.findOne({
+    $or: [{ username: user.username }, { email: user.email }],
+  });
+  console.log(checkUsername);
+  if (checkUsername && checkUsername._id !== user._id)
+    next("username and email  must be unique");
+  else next();
 });
 
 ProfileSchema.methods.comparePassword = async function comparePassword(
