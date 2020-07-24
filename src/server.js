@@ -11,6 +11,7 @@ const commentsRouter = require("./routes/comments");
 const profilesRouter = require("./routes/profilesRoute");
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
+const cors_proxy = require("cors-anywhere");
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -29,32 +30,33 @@ app.set("twig options", {
 });
 global.appRoot = __dirname;
 app.use("/static", express.static(path.join(__dirname, "./public")));
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin
-      // (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg =
-          "The CORS policy for this site does not " +
-          "allow access from the specified Origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-  })
-);
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Credentials", true);
-  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
-  );
-  next();
-});
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       // allow requests with no origin
+//       // (like mobile apps or curl requests)
+//       if (!origin) return callback(null, true);
+//       if (allowedOrigins.indexOf(origin) === -1) {
+//         const msg =
+//           "The CORS policy for this site does not " +
+//           "allow access from the specified Origin.";
+//         return callback(new Error(msg), false);
+//       }
+//       return callback(null, true);
+//     },
+//   })
+// );
+
+// app.use(function (req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Credentials", true);
+//   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin,X-Requested-With,Content-Type,Accept,content-type,application/json"
+//   );
+//   next();
+// });
 app.use(express.json());
 app.use("/profile", profilesRouter);
 app.use("/profile", authorize, educationRouter);
@@ -68,7 +70,13 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
-    })
+    cors_proxy
+      .createServer({
+        originWhitelist: [], // Allow all origins
+        requireHeader: ["origin", "x-requested-with"],
+        removeHeaders: ["cookie", "cookie2"],
+      })
+      .listen(process.env.PORT, () => {
+        console.log(`Server is running on port ${process.env.PORT}`);
+      })
   );
