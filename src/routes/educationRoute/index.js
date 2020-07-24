@@ -27,9 +27,12 @@ router
   .post(async (req, res) => {
     try {
       const user = basicAuth(req);
-      if (user.name !== req.body.username) res.status(403).send("unauthorized");
+      if (user.name !== req.req.username) res.status(403).send("unauthorized");
       else {
-        const result = await new EducationModel({ ...req.body }).save();
+        const result = await new EducationModel({
+          ...req.body,
+          username: user.name,
+        }).save();
         res.status(200).send(result);
       }
     } catch (e) {
