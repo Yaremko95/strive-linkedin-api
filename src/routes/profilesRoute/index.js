@@ -105,13 +105,11 @@ profilesRouter.post("/", async (req, res, next) => {
     });
     const result = await newProfile.save();
     console.log(result);
-    res
-      .status(201)
-      .send({
-        _id: result._id,
-        username: result.username,
-        password: result.password,
-      });
+    res.status(201).send({
+      _id: result._id,
+      username: result.username,
+      password: result.password,
+    });
   } catch (error) {
     next(error);
   }
@@ -170,6 +168,7 @@ profilesRouter.delete("/:username", authorization, async (req, res, next) => {
 //commetn
 profilesRouter.route("/login").post(async (req, res, next) => {
   try {
+    console.log(req);
     const reqUser = basicAuth(req);
     const user = await ProfileSchema.findOne(
       { username: reqUser.name },
