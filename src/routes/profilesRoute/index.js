@@ -105,7 +105,13 @@ profilesRouter.post("/", async (req, res, next) => {
     });
     const result = await newProfile.save();
     console.log(result);
-    res.status(201).send(result);
+    res
+      .status(201)
+      .send({
+        _id: result._id,
+        username: result.username,
+        password: result.password,
+      });
   } catch (error) {
     next(error);
   }

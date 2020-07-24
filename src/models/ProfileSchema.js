@@ -80,7 +80,6 @@ ProfileSchema.pre("findOneAndUpdate", async function preUpdate(next) {
     console.log(this);
     const hash = await bcrypt.hash(user._update.password, 12);
     this.update({ password: hash });
-
     next();
   } catch (e) {
     next(e);
