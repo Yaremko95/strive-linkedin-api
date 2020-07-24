@@ -34,7 +34,7 @@ console.log(listEndpoints(app));
 mongoose
   .connect(process.env.MONGOHOST, {
     useNewUrlParser: true,
-    useUnifiedTopology: false,
+    useUnifiedTopology: true,
   })
   .then(
     app.listen(process.env.PORT, () => {
