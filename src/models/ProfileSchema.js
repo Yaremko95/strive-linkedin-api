@@ -75,16 +75,17 @@ ProfileSchema.pre("save", async function preSave(next) {
 
 ProfileSchema.pre("findOneAndUpdate", async function preUpdate(next) {
   const user = this;
-
-  try {
-    console.log(this);
-    const hash = await bcrypt.hash(user._update.password, 12);
-    this.update({ password: hash });
-    next();
-  } catch (e) {
-    next(e);
+  if (!user._update.password) next();
+  else {
+    try {
+      console.log(this);
+      const hash = await bcrypt.hash(user._update.password, 12);
+      this.update({ password: hash });
+      next();
+    } catch (e) {
+      next(e);
+    }
   }
-  //}
 });
 
 ProfileSchema.pre("validate", async function preValidate(next) {
