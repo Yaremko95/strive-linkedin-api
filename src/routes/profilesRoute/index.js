@@ -9,8 +9,9 @@ const getPdf = require("../../utils/generatePdf/getPdf");
 const router = express.Router();
 const upload = multer();
 const authorization = require("../../utils/auth");
-
+const passport = require("passport");
 const profilesDirectory = join(__dirname, "../../public/profiles");
+const jwt = require("jsonwebtoken");
 
 const profilesRouter = express.Router();
 
@@ -180,29 +181,73 @@ profilesRouter.delete("/:username", authorization, async (req, res, next) => {
 });
 //commetn
 profilesRouter.route("/login").post(async (req, res, next) => {
-  try {
-    const reqUser = basicAuth(req);
-    console.log(reqUser);
+  // try {
+  //   const reqUser = basicAuth(req);
+  //   console.log(reqUser);
+  //
+  //   await ProfileSchema.findOne({ username: reqUser.name }, (err, user) => {
+  //     if (err) throw new Error(err);
+  //     console.log(user);
+  //     user.comparePassword(reqUser.pass, function (err, isMatch) {
+  //       if (err) throw new Error(err);
+  //       if (isMatch)
+  //         res.send({
+  //           _id: user._id,
+  //           username: user.username,
+  //           password: user.password,
+  //           image: user.image,
+  //         });
+  //       else next("Incorrect username or password");
+  //     });
+  //   });
+  // } catch (e) {
+  //   next(e);
+  // }
+  passport.authenticate(
+    "local",
+    { session: false },
+    async (err, user, info) => {
+      if (err || !user) {
+        return res.status(400).json({
+          message: info,
+        });
+      }
+      req.login(user, { session: false }, async (err) => {
+        if (err) {
+          res.status(500).send(err);
+        }
+        const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
+          expiresIn: "150000",
+        });
+        const refreshToken = jwt.sign(
+          { _id: user._id },
+          process.env.REFRESH_JWT_KEY,
+          {
+            expiresIn: "1 week",
+          }
+        );
+        user.refresh_tokens = user.refresh_tokens.concat(refreshToken);
+        console.log(user);
+        await ProfileSchema.findOneAndUpdate(
+          { _id: user._id },
+          { refresh_tokens: user.refresh_tokens }
+        );
+        res.cookie("accessToken", token, {
+          path: "/",
+          httpOnly: true,
+        });
 
-    await ProfileSchema.findOne({ username: reqUser.name }, (err, user) => {
-      if (err) throw new Error(err);
-      console.log(user);
-      user.comparePassword(reqUser.pass, function (err, isMatch) {
-        if (err) throw new Error(err);
-        if (isMatch)
-          res.send({
-            _id: user._id,
-            username: user.username,
-            password: user.password,
-            image: user.image,
-          });
-        else next("Incorrect username or password");
+        res.cookie("refreshToken", refreshToken, {
+          path: "/",
+          httpOnly: true,
+        });
+
+        return res.json({ token, refreshToken });
       });
-    });
-  } catch (e) {
-    next(e);
-  }
+    }
+  )(req, res, next);
 });
+
 profilesRouter
   .route("/:profileId")
   .post(upload.single("profile"), authorization, async (req, res) => {

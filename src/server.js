@@ -14,7 +14,7 @@ makeDirectory();
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-// const pass = require("./passport");
+const pass = require("./passport");
 const app = express();
 app.use(passport.initialize());
 app.use(cookieParser());
