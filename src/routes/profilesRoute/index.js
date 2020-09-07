@@ -140,24 +140,28 @@ profilesRouter.put("/:username", authorization, async (req, res, next) => {
   }
 });
 
-profilesRouter.post("/logout", async (req, res, next) => {
-  try {
-    req.user.refresh_tokens = req.user.refresh_tokens.filter(
-      (t) => t !== req.cookies.refreshToken
-    );
-    await ProfileSchema.findOneAndUpdate(
-      { _id: req.user._id },
-      { refresh_tokens: req.user.refresh_tokens }
-    );
+profilesRouter.post(
+  "/logout",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res, next) => {
+    try {
+      req.user.refresh_tokens = req.user.refresh_tokens.filter(
+        (t) => t !== req.cookies.refreshToken
+      );
+      await ProfileSchema.findOneAndUpdate(
+        { _id: req.user._id },
+        { refresh_tokens: req.user.refresh_tokens }
+      );
 
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-    res.status(200).send();
-  } catch (e) {
-    console.log(e);
-    next(e);
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+      res.status(200).send();
+    } catch (e) {
+      console.log(e);
+      next(e);
+    }
   }
-});
+);
 
 profilesRouter.route("/login").post(async (req, res, next) => {
   passport.authenticate(
