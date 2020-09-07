@@ -12,6 +12,7 @@ const authorization = require("../../utils/auth");
 const passport = require("passport");
 const profilesDirectory = join(__dirname, "../../public/profiles");
 const jwt = require("jsonwebtoken");
+const { authenticate } = require("./helpers");
 
 const profilesRouter = express.Router();
 
@@ -207,6 +208,43 @@ profilesRouter.route("/login").post(async (req, res, next) => {
       });
     }
   )(req, res, next);
+});
+
+profilesRouter.route("/refreshToken").post(async (req, res, next) => {
+  const refreshToken = req.cookies.refreshToken;
+  console.log(req);
+  if (refreshToken) {
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY);
+    const user = await ProfileSchema.findOne({ _id: decoded._id });
+    if (!user) res.status(401).send("no user");
+    else {
+      const currentToken = user.refresh_tokens.find(
+        (token) => token === refreshToken
+      );
+      if (!currentToken) res.status(401).send("no token");
+      else {
+        user.refresh_tokens = user.refresh_tokens.filter(
+          (t) => t !== currentToken
+        );
+        const data = await authenticate(user);
+        res.cookie("accessToken", data.token, {
+          path: "/",
+          httpOnly: true,
+        });
+
+        res.cookie("refreshToken", data.refreshToken, {
+          path: "/",
+          httpOnly: true,
+        });
+        res.send({
+          token: data.token,
+          refreshToken: data.refreshToken,
+        });
+      }
+    }
+  } else {
+    res.status(401).send();
+  }
 });
 
 profilesRouter
