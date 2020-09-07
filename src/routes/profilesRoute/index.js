@@ -98,23 +98,6 @@ profilesRouter.get("/:username/pdf", authorization, async (req, res, next) => {
 });
 
 profilesRouter.post("/", async (req, res, next) => {
-  // try {
-  //   console.log(req.body);
-  //   const user = basicAuth(req);
-  //   const newProfile = await new ProfileSchema({
-  //     ...req.body,
-  //   });
-  //   const result = await newProfile.save();
-  //   console.log(result);
-  //   res.status(201).send({
-  //     _id: result._id,
-  //     username: result.username,
-  //     password: result.password,
-  //   });
-  // } catch (error) {
-  //   next(error);
-  // }
-
   try {
     const newUser = await new ProfileSchema({
       ...req.body,
@@ -157,52 +140,26 @@ profilesRouter.put("/:username", authorization, async (req, res, next) => {
   }
 });
 
-profilesRouter.delete("/:username", authorization, async (req, res, next) => {
+profilesRouter.post("/logout", async (req, res, next) => {
   try {
-    const user = basicAuth(req);
-    if (user.name !== req.params.username) res.status(403).send("unauthorized");
-    else {
-      await ProfileSchema.findOneAndDelete({ username: user.name }, function (
-        err,
-        docs
-      ) {
-        if (err) {
-          console.log(err);
-          next(err);
-        } else {
-          console.log("Deleted User : ", docs);
-          res.send("Deleted");
-        }
-      });
-    }
-  } catch (error) {
-    next(error);
+    req.user.refresh_tokens = req.user.refresh_tokens.filter(
+      (t) => t !== req.cookies.refreshToken
+    );
+    await ProfileSchema.findOneAndUpdate(
+      { _id: req.user._id },
+      { refresh_tokens: req.user.refresh_tokens }
+    );
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).send();
+  } catch (e) {
+    console.log(e);
+    next(e);
   }
 });
-//commetn
+
 profilesRouter.route("/login").post(async (req, res, next) => {
-  // try {
-  //   const reqUser = basicAuth(req);
-  //   console.log(reqUser);
-  //
-  //   await ProfileSchema.findOne({ username: reqUser.name }, (err, user) => {
-  //     if (err) throw new Error(err);
-  //     console.log(user);
-  //     user.comparePassword(reqUser.pass, function (err, isMatch) {
-  //       if (err) throw new Error(err);
-  //       if (isMatch)
-  //         res.send({
-  //           _id: user._id,
-  //           username: user.username,
-  //           password: user.password,
-  //           image: user.image,
-  //         });
-  //       else next("Incorrect username or password");
-  //     });
-  //   });
-  // } catch (e) {
-  //   next(e);
-  // }
   passport.authenticate(
     "local",
     { session: false },
