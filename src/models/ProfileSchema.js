@@ -20,24 +20,24 @@ const ProfileSchema = new Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: false,
     },
     email: {
       type: String,
       required: true,
       lowercase: true,
-      // validate: {
-      //   validator: async (value) => {
-      //     if (!v.isEmail(value)) {
-      //       throw new Error("Email is invalid");
-      //     } else {
-      //       const checkEmail = await ProfileModel.findOne({ email: value });
-      //       if (checkEmail) {
-      //         throw new Error("Email already existant!");
-      //       }
-      //     }
-      //   },
-      // },
+      validate: {
+        validator: async (value) => {
+          if (!v.isEmail(value)) {
+            throw new Error("Email is invalid");
+          } else {
+            const checkEmail = await ProfileModel.findOne({ email: value });
+            if (checkEmail) {
+              throw new Error("Email already existant!");
+            }
+          }
+        },
+      },
       area: {
         type: String,
       },
@@ -48,14 +48,25 @@ const ProfileSchema = new Schema(
     username: {
       type: String,
       required: true,
-      // validate: {
-      //   validator: async (value) => {
-      //     const checkUsername = await ProfileModel.findOne({ username: value });
-      //     if (checkUsername) {
-      //       throw new Error("Username already existant!");
-      //     }
-      //   },
-      // },
+      validate: {
+        validator: async (value) => {
+          const checkUsername = await ProfileModel.findOne({ username: value });
+          if (checkUsername) {
+            throw new Error("Username already existant!");
+          }
+        },
+      },
+    },
+    refresh_tokens: [{ type: String }],
+    googleid: {
+      type: String,
+      required: false,
+      defaultValue: "",
+    },
+    facebookid: {
+      type: String,
+      required: false,
+      defaultValue: "",
     },
   },
   { timestamps: true }
@@ -63,6 +74,7 @@ const ProfileSchema = new Schema(
 ProfileSchema.pre("save", async function preSave(next) {
   const user = this;
   if (!user.isModified("password")) next();
+  if (user.googleid || user.facebookid) next();
   else {
     try {
       const hash = await bcrypt.hash(user.password, 12);
@@ -76,6 +88,7 @@ ProfileSchema.pre("save", async function preSave(next) {
 ProfileSchema.pre("findOneAndUpdate", async function preUpdate(next) {
   const user = this;
   if (!user._update.password) next();
+  if (user.googleid || user.facebookid) next();
   else {
     try {
       console.log(this);
