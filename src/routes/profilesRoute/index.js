@@ -9,6 +9,9 @@ const getPdf = require("../../utils/generatePdf/getPdf");
 const router = express.Router();
 const upload = multer();
 const authorization = require("../../utils/auth");
+const { generateJWT, generateRefreshJWT } = require("../../utils/jwt");
+
+const passport = require("../../utils/strategy");
 
 const profilesDirectory = join(__dirname, "../../public/profiles");
 
@@ -227,5 +230,37 @@ profilesRouter
       res.status(500).send("bad request");
     }
   });
+
+profilesRouter.get(
+  "/login/facebook",
+  passport.authenticate("facebook", { scope: "email" })
+);
+
+profilesRouter.get(
+  "/login/facebookRedirect",
+  passport.authenticate("facebook"),
+  async (req, res, next) => {
+    try {
+      console.log(req.user);
+      const newAccessToken = await generateJWT({ name: req.user.name });
+      const newRefreshToken = await generateRefreshJWT({ name: req.user.name });
+
+      const newUser = await ProfileSchema.findOne({
+        email: req.user.emails[0].value,
+      });
+      newUser.refresh_tokens.push({ token: newRefreshToken });
+
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+      });
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+      });
+      res.status(200).redirect("http://localhost:3000/");
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 
 module.exports = profilesRouter;

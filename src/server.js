@@ -4,13 +4,14 @@ const path = require("path");
 const dotenv = require("dotenv");
 const listEndpoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
-const authorize = require("./utils/auth");
+// const authorize = require("./utils/auth");
 const postsRouter = require("./routes/postsRoute");
 const experienceRouter = require("./routes/experienceRoute");
 const commentsRouter = require("./routes/comments");
 const profilesRouter = require("./routes/profilesRoute");
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
+const passport = require("./utils/strategy");
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -33,6 +34,9 @@ app.use(function (req, res, next) {
   next();
 });
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.set("twig options", {
   strict_variables: false,
   cache: false,
@@ -43,10 +47,10 @@ app.use("/static", express.static(path.join(__dirname, "./public")));
 
 app.use(express.json());
 app.use("/profile", profilesRouter);
-app.use("/profile", authorize, educationRouter);
-app.use("/profile", experienceRouter);
-app.use("/posts", authorize, postsRouter);
-app.use("/comments", authorize, commentsRouter);
+// app.use("/profile", educationRouter);
+// app.use("/profile", experienceRouter);
+app.use("/posts", postsRouter);
+app.use("/comments", commentsRouter);
 console.log(listEndpoints(app));
 mongoose
   .connect(process.env.MONGOHOST, {
