@@ -271,40 +271,39 @@ profilesRouter.route("/refreshToken").post(async (req, res, next) => {
   }
 });
 
-profilesRouter
-  .route("/:profileId")
-  .post(
-    upload.single("profile"),
-    passport.authenticate("jwt", { session: false }),
-    async (req, res) => {
-      try {
-        if (req.user._id === req.params.profileId) {
-          const [filename, extension] = req.file.mimetype.split("/");
-          await fs.writeFile(
-            join(profilesDirectory, `${req.params.profileId}.${extension}`),
-            req.file.buffer
-          );
+profilesRouter.route("/:profileId").post(
+  passport.authenticate("jwt", { session: false }),
+  upload.single("profile"),
 
-          let url = `${req.protocol}://${req.host}${
-            process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-          }/static/profiles/${req.params.profileId}.${extension}`;
-          const result = await ProfileSchema.findByIdAndUpdate(
-            req.params.profileId,
-            {
-              image: url,
-              username: user.name,
-            }
-          );
-          result.password = "";
-          res.status(200).send(result);
-        } else {
-          res.status(403).send("unauthorised");
-        }
-      } catch (e) {
-        console.log(e);
-        res.status(500).send("bad request");
+  async (req, res) => {
+    try {
+      if (req.user._id === req.params.profileId) {
+        const [filename, extension] = req.file.mimetype.split("/");
+        await fs.writeFile(
+          join(profilesDirectory, `${req.params.profileId}.${extension}`),
+          req.file.buffer
+        );
+
+        let url = `${req.protocol}://${req.host}${
+          process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
+        }/static/profiles/${req.params.profileId}.${extension}`;
+        const result = await ProfileSchema.findByIdAndUpdate(
+          req.params.profileId,
+          {
+            image: url,
+            username: user.name,
+          }
+        );
+        result.password = "";
+        res.status(200).send(result);
+      } else {
+        res.status(403).send("unauthorised");
       }
+    } catch (e) {
+      console.log(e);
+      res.status(500).send("bad request");
     }
-  );
+  }
+);
 
 module.exports = profilesRouter;

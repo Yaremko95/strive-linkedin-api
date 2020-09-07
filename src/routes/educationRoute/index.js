@@ -26,13 +26,12 @@ router
   })
   .post(async (req, res) => {
     try {
-      const user = basicAuth(req);
-      if (user.name !== req.params.userName)
+      if (req.user.username !== req.params.userName)
         res.status(403).send("unauthorized");
       else {
         const result = await new EducationModel({
           ...req.body,
-          username: user.name,
+          username: req.user.username,
         }).save();
         res.status(200).send(result);
       }
@@ -78,13 +77,13 @@ router
   })
   .put(async (req, res) => {
     try {
-      const user = basicAuth(req);
       const data = await EducationModel.findById(req.params.id);
-      if (user.name !== data.username) res.status(403).send("unauthorized");
+      if (req.user.username !== data.username)
+        res.status(403).send("unauthorized");
       else {
         const result = await EducationModel.findByIdAndUpdate(req.params.id, {
           ...req.body,
-          username: user.name,
+          username: req.user.username,
         });
         if (result) res.status(200).send(result);
         else res.status(404).send("not found");
@@ -96,9 +95,9 @@ router
   })
   .delete(async (req, res) => {
     try {
-      const user = basicAuth(req);
       const data = await EducationModel.findById(req.params.id);
-      if (user.name !== data.username) res.status(403).send("unauthorized");
+      if (req.user.username !== data.username)
+        res.status(403).send("unauthorized");
       else {
         const result = await EducationModel.findByIdAndDelete(req.params.id);
         if (result) res.status(200).send("ok");
@@ -115,9 +114,9 @@ router
     try {
       console.log(req.body);
       const item = await EducationModel.findById(req.params.id);
-      const user = basicAuth(req);
+
       if (item) {
-        if (item.username === user.name) {
+        if (item.username === req.user.username) {
           const [filename, extension] = req.file.mimetype.split("/");
           await fs.writeFile(
             join(eduPictureDir, `${req.params.id}.${extension}`),

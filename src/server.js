@@ -40,10 +40,26 @@ app.use("/static", express.static(path.join(__dirname, "./public")));
 
 app.use(express.json());
 app.use("/profile", profilesRouter);
-app.use("/profile", authorize, educationRouter);
-app.use("/profile", experienceRouter);
-app.use("/posts", authorize, postsRouter);
-app.use("/comments", authorize, commentsRouter);
+app.use(
+  "/profile",
+  passport.authenticate("jwt", { session: false }),
+  educationRouter
+);
+app.use(
+  "/profile",
+  passport.authenticate("jwt", { session: false }),
+  experienceRouter
+);
+app.use(
+  "/posts",
+  passport.authenticate("jwt", { session: false }),
+  postsRouter
+);
+app.use(
+  "/comments",
+  passport.authenticate("jwt", { session: false }),
+  commentsRouter
+);
 console.log(listEndpoints(app));
 mongoose
   .connect(process.env.MONGOHOST, {

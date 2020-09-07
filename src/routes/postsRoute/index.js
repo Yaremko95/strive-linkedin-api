@@ -43,6 +43,7 @@ router
         res.send(
           posts.map((post) => {
             post.user.password = "";
+            post.user.refresh_tokens = [];
             return post;
           })
         );
@@ -58,11 +59,11 @@ router
         "http://localhost:3005/static/profilePictures/default_image.jpg";
       const user = basicAuth(req);
 
-      if (await PostSchema.userExists(user.name)) {
+      if (await PostSchema.userExists(req.user._id)) {
         const result = await new PostSchema({
           ...req.body,
           image: imageUrl,
-          username: user.name,
+          username: req.user.username,
         });
         const data = await result.save();
 
@@ -93,12 +94,11 @@ router
   .put(async (req, res, next) => {
     try {
       const post = await PostSchema.findById(req.params.id);
-      const user = basicAuth(req);
       if (post) {
-        if (post.username === user.name) {
+        if (post.username === req.user.username) {
           const result = await PostSchema.findByIdAndUpdate(req.params.id, {
             ...req.body,
-            username: user.name,
+            username: req.user.username,
           });
           res.status(200).send(result);
         } else {
@@ -117,7 +117,7 @@ router
       const post = await PostSchema.findById(req.params.id);
       const user = basicAuth(req);
       if (post) {
-        if (post.username === user.name) {
+        if (post.username === req.user.username) {
           await PostSchema.findByIdAndDelete(req.params.id);
           res.status(200).send("ok");
         } else {
@@ -137,7 +137,7 @@ router.route("/:postId").post(upload.single("post"), async (req, res) => {
     const post = await PostSchema.findById(req.params.postId);
     const user = basicAuth(req);
     if (post) {
-      if (post.username === user.name) {
+      if (post.username === req.user.username) {
         const [filename, extension] = req.file.mimetype.split("/");
         await fs.writeFile(
           join(postsDirectory, `${req.params.postId}.${extension}`),
@@ -149,7 +149,7 @@ router.route("/:postId").post(upload.single("post"), async (req, res) => {
         }/static/posts/${req.params.postId}.${extension}`;
         const result = await PostSchema.findByIdAndUpdate(req.params.postId, {
           image: url,
-          username: user.name,
+          username: req.user.username,
         });
         console.log(result);
         res.status(200).send(result);

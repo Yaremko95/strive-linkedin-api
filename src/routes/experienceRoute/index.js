@@ -38,12 +38,12 @@ experienceRouter.get("/:userName/experiences/:id", async (req, res, next) => {
 
 experienceRouter.post("/:userName/experiences", async (req, res, next) => {
   try {
-    const user = basicAuth(req);
-    if (user.name !== req.params.userName) res.status(403).send("unauthorized");
+    if (req.user.username !== req.params.userName)
+      res.status(403).send("unauthorized");
     else {
       const newExperience = new ExperienceSchema({
         ...req.body,
-        username: user.name,
+        username: req.user.username,
       });
       const result = await newExperience.save();
       res.status(200).send(result);
@@ -83,15 +83,15 @@ experienceRouter.post("/:userName/experiences/csv", async (req, res) => {
 });
 experienceRouter.put("/:userName/experiences/:id", async (req, res, next) => {
   try {
-    const user = basicAuth(req);
     const data = await ExperienceSchema.findById(req.params.id);
-    if (user.name !== data.username) res.status(403).send("unauthorized");
+    if (req.user.username !== data.username)
+      res.status(403).send("unauthorized");
     else {
       const experience = await ExperienceSchema.findByIdAndUpdate(
         req.params.id,
         {
           ...req.body,
-          username: user.name,
+          username: req.user.username,
         }
       );
       if (experience) {
@@ -114,13 +114,13 @@ experienceRouter.delete(
   "/:userName/experiences/:id",
   async (req, res, next) => {
     try {
-      const user = basicAuth(req);
       const data = await ExperienceSchema.findById(req.params.id);
-      if (user.name !== data.username) res.status(403).send("unauthorized");
+      if (req.user.username !== data.username)
+        res.status(403).send("unauthorized");
       else {
         const experience = await ExperienceSchema.findByIdAndDelete(
           req.params.id,
-          { ...req.body, username: user.username }
+          { ...req.body, username: req.user.username }
         );
 
         if (experience) {
@@ -144,9 +144,9 @@ experienceRouter
     try {
       console.log(req.body);
       const item = await ExperienceSchema.findById(req.params.id);
-      const user = basicAuth(req);
+
       if (item) {
-        if (item.username === user.name) {
+        if (item.username === req.user.username) {
           const [filename, extension] = req.file.mimetype.split("/");
           await fs.writeFile(
             join(expDir, `${req.params.id}.${extension}`),
@@ -159,7 +159,7 @@ experienceRouter
             req.params.id,
             {
               image: url,
-              username: user.name,
+              username: req.user.username,
             }
           );
           res.status(200).send(result);
