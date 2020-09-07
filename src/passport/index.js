@@ -25,6 +25,31 @@ passport.use(
   )
 );
 
+passport.use(
+  new JWTStrategy(
+    {
+      jwtFromRequest: function (req) {
+        let token = null;
+        if (req && req.cookies) {
+          token = req.cookies["accessToken"];
+        }
+        return token;
+      },
+      secretOrKey: process.env.JWT_SECRET_KEY,
+    },
+    async function (jwtPayload, cb) {
+      console.log("jwtPayload", jwtPayload);
+
+      const user = await Profile.findOne({ _id: jwtPayload._id });
+      if (user) {
+        return cb(null, user);
+      } else {
+        return cb(null, false, { message: "unauthorized" });
+      }
+    }
+  )
+);
+
 passport.serializeUser(function (user, done) {
   done(null, user);
 });
