@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const dotenv = require("dotenv");
 const listEndpoints = require("express-list-endpoints");
 const mongoose = require("mongoose");
 const authorize = require("./utils/auth");
@@ -11,16 +10,14 @@ const commentsRouter = require("./routes/comments");
 const profilesRouter = require("./routes/profilesRoute");
 const educationRouter = require("./routes/educationRoute");
 const makeDirectory = require("./utils/mkdir");
-
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://agile-brushlands-83006.herokuapp.com/",
-];
-
 makeDirectory();
-
-dotenv.config();
+const passport = require("passport");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
+// const pass = require("./passport");
 const app = express();
+app.use(passport.initialize());
+app.use(cookieParser());
 app.use(cors());
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");

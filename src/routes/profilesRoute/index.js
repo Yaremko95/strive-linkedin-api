@@ -97,21 +97,34 @@ profilesRouter.get("/:username/pdf", authorization, async (req, res, next) => {
 });
 
 profilesRouter.post("/", async (req, res, next) => {
+  // try {
+  //   console.log(req.body);
+  //   const user = basicAuth(req);
+  //   const newProfile = await new ProfileSchema({
+  //     ...req.body,
+  //   });
+  //   const result = await newProfile.save();
+  //   console.log(result);
+  //   res.status(201).send({
+  //     _id: result._id,
+  //     username: result.username,
+  //     password: result.password,
+  //   });
+  // } catch (error) {
+  //   next(error);
+  // }
+
   try {
-    console.log(req.body);
-    const user = basicAuth(req);
-    const newProfile = await new ProfileSchema({
+    const newUser = await new ProfileSchema({
       ...req.body,
-    });
-    const result = await newProfile.save();
-    console.log(result);
-    res.status(201).send({
-      _id: result._id,
-      username: result.username,
-      password: result.password,
-    });
-  } catch (error) {
-    next(error);
+      refresh_tokens: [],
+    }).save();
+    res.status(200).send({ _id: newUser._id });
+  } catch (e) {
+    console.log(e);
+    const err = new Error(e);
+    err.httpStatusCode = 500;
+    next(err);
   }
 });
 
