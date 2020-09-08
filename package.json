@@ -36,6 +36,10 @@
     "pump": "^3.0.0",
     "q": "^1.5.1",
     "query-to-mongo": "^0.10.1",
+    "redis": "^3.0.2",
+    "redis-connection": "^5.4.0",
+    "socket.io": "^2.3.0",
+    "socket.io-redis": "^5.4.0",
     "test": "^0.6.0",
     "twig": "^1.15.1",
     "validator": "^13.1.1"
