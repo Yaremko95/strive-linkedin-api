@@ -6,11 +6,10 @@ const router = express.Router();
 
 router.route("/").post(async (req, res) => {
   try {
-    const user = basicAuth(req);
     const result = await new CommentModel({
       ...req.body,
 
-      author: user.name,
+      author: req.user.username,
     }).save();
     res.status(200).send(result);
   } catch (e) {
