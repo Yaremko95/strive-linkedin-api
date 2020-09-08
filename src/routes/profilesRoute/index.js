@@ -203,7 +203,7 @@ profilesRouter.route("/login").post(async (req, res, next) => {
           res.status(500).send(err);
         }
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
-          expiresIn: "150000",
+          expiresIn: "1 week",
         });
         const refreshToken = jwt.sign(
           { _id: user._id },

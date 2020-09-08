@@ -2,7 +2,7 @@ const redis = require("redis");
 const redisClient = redis.createClient();
 const Profile = require("../../models/ProfileSchema");
 const jwt = require("jsonwebtoken");
-
+const uuid = require("uuid");
 const authorizeSocket = async (socket, next) => {
   try {
     const { accessToken } = socket.handshake.query;
@@ -41,55 +41,77 @@ const authorizeSocket = async (socket, next) => {
 const socketHandler = (io) => {
   io.on("connection", function (socket) {
     const { user } = socket;
-    console.log(socket.user);
 
     socket.on("login", async (options) => {
-      // socket.username = options.username;
-
-      redisClient.lpush(
-        "users",
-        JSON.stringify({
-          _id: user._id,
-          username: user.username,
-          socketid: socket.id,
-        })
-      );
+      redisClient.lrange("users", 0, -1, function (err, users) {
+        console.log("users", users);
+        //checks if there is a user with same socketid
+        const userExists = users
+          .map((user) => JSON.parse(user))
+          .find((json) => {
+            return json.socketid === socket.id;
+          });
+        console.log(userExists);
+        if (!userExists) {
+          redisClient.lpush(
+            "users",
+            JSON.stringify({
+              _id: user._id,
+              username: user.username,
+              socketid: socket.id,
+            })
+          );
+        }
+        redisClient.lrange("users", 0, -1, function (err, users) {
+          console.log(users);
+          users = users
+            .map((user) => JSON.parse(user))
+            .filter((value, index, self) => {
+              return (
+                self.findIndex((v) => v.username === value.username) === index
+              );
+            });
+          // console.log(users);
+          io.emit("loggedIn", {
+            users: users,
+          });
+        });
+      });
 
       redisClient.lrange("history", 0, -1, function (err, messages) {
         console.log(messages);
         messages = messages
           .map((msg) => JSON.parse(msg))
           .filter(
-            (msg) =>
-              msg.from === socket.user.username ||
-              msg.to === socket.user.username
+            (msg) => msg.from === user.username || msg.to === user.username
           );
 
-        io.emit("history", { username: socket.username, history: messages });
-      });
-
-      redisClient.lrange("users", 0, -1, function (err, users) {
-        console.log(users);
-        io.emit("loggedIn", {
-          user: {
-            _id: user._id,
-            username: user.username,
-            socketid: socket.id,
-          },
-          users: users.map((user) => JSON.parse(user)),
-        });
+        socket.emit("history", { username: user.username, history: messages });
       });
     });
     socket.on("sendMsg", (data) => {
-      const newMsg = {
-        from: socket.user.username,
-        to: data.username,
-        date: new Date(),
-        text: data.text,
-      };
-
-      redisClient.lpush("history", JSON.stringify(newMsg));
-      socket.broadcast.to(data.id).emit("receiveMsg", newMsg);
+      redisClient.lrange("users", 0, -1, function (err, users) {
+        const receivers = users
+          .map((user) => JSON.parse(user))
+          .filter((json) => {
+            return json.username === data.to;
+          });
+        console.log("receiver", receivers);
+        const newMsg = {
+          _id: uuid.v1(),
+          from: user.username,
+          to: data.to,
+          date: new Date(),
+          text: data.text,
+        };
+        console.log(newMsg);
+        if (receivers.length > 0) {
+          receivers.forEach((receiver) => {
+            socket.broadcast.to(receiver.socketid).emit("receiveMsg", newMsg);
+          });
+        }
+        redisClient.lpush("history", JSON.stringify(newMsg));
+      });
     });
     socket.on("typing", function (data) {
       socket.broadcast.emit("typing", data);
