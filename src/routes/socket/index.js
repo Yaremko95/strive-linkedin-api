@@ -78,15 +78,44 @@ const socketHandler = (io) => {
         });
       });
 
-      redisClient.lrange("history", 0, -1, function (err, messages) {
+      redisClient.lrange(`history:${user.username}`, 0, -1, function (
+        err,
+        messages
+      ) {
         console.log(messages);
-        messages = messages
-          .map((msg) => JSON.parse(msg))
-          .filter(
-            (msg) => msg.from === user.username || msg.to === user.username
-          );
+        messages = messages.map((msg) => JSON.parse(msg));
+        socket.emit(`history`, { username: user.username, history: messages });
+      });
+    });
 
-        socket.emit("history", { username: user.username, history: messages });
+    socket.on("deleteMsg", (data) => {
+      redisClient.lrange(`history:${user.username}`, 0, -1, function (
+        err,
+        messages
+      ) {
+        const toDelete = messages
+          .map((msg) => JSON.stringify(msg))
+          .find((msg) => msg._id === data._id);
+        redisClient.lrem(
+          `history:${user.username}`,
+          0,
+          JSON.parse(toDelete),
+          function (err, res) {
+            if (res > 0) {
+              redisClient.lrange(`history:${user.username}`, 0, -1, function (
+                err,
+                msgs
+              ) {
+                msgs = msgs.map((msg) => JSON.parse(msg));
+
+                socket.emit("history", {
+                  username: user.username,
+                  history: msgs,
+                });
+              });
+            }
+          }
+        );
       });
     });
     socket.on("sendMsg", (data) => {
@@ -110,7 +139,8 @@ const socketHandler = (io) => {
             socket.broadcast.to(receiver.socketid).emit("receiveMsg", newMsg);
           });
         }
-        redisClient.lpush("history", JSON.stringify(newMsg));
+        redisClient.lpush(`history:${user.username}`, JSON.stringify(newMsg));
+        redisClient.lpush(`history:${data.to}`, JSON.stringify(newMsg));
       });
     });
     socket.on("typing", function (data) {
