@@ -68,6 +68,11 @@ const ProfileSchema = new Schema(
       required: false,
       defaultValue: "",
     },
+    socketid: {
+      type: String,
+      required: false,
+      defaultValue: null,
+    },
   },
   { timestamps: true }
 );
