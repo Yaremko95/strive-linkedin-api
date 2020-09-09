@@ -3,6 +3,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const Profile = require("../models/ProfileSchema");
+const FacebookStrategy = require("passport-facebook");
 
 passport.use(
   new LocalStrategy(
