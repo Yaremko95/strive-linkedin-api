@@ -43,6 +43,22 @@ profilesRouter.get(
     }
   }
 );
+profilesRouter
+  .route("/me")
+  .get(
+    passport.authenticate("jwt", { session: false }),
+    async (req, res, next) => {
+      try {
+        res
+          .status(200)
+          .send({ ...req.user._doc, password: "", refresh_tokens: [] });
+      } catch (e) {
+        const error = new Error();
+        error.httpStatusCode = 404;
+        next(error);
+      }
+    }
+  );
 
 profilesRouter.get(
   "/:username",
@@ -203,7 +219,7 @@ profilesRouter.route("/login").post(async (req, res, next) => {
           res.status(500).send(err);
         }
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
-          expiresIn: "1 week",
+          expiresIn: "10000",
         });
         const refreshToken = jwt.sign(
           { _id: user._id },
@@ -228,7 +244,7 @@ profilesRouter.route("/login").post(async (req, res, next) => {
           httpOnly: true,
         });
 
-        return res.json({ token, refreshToken });
+        return res.json({ ...user._doc, refresh_tokens: [], password: "" });
       });
     }
   )(req, res, next);
@@ -236,17 +252,23 @@ profilesRouter.route("/login").post(async (req, res, next) => {
 
 profilesRouter.route("/refreshToken").post(async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken;
-  console.log(req);
+
   if (refreshToken) {
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_JWT_KEY);
     const user = await ProfileSchema.findOne({ _id: decoded._id });
-    if (!user) res.status(401).send("no user");
-    else {
+    if (!user) {
+      console.log("no user");
+
+      res.status(401).send("no user");
+    } else {
       const currentToken = user.refresh_tokens.find(
         (token) => token === refreshToken
       );
-      if (!currentToken) res.status(401).send("no token");
-      else {
+      if (!currentToken) {
+        console.log("no token");
+
+        res.status(401).send("no token");
+      } else {
         user.refresh_tokens = user.refresh_tokens.filter(
           (t) => t !== currentToken
         );
@@ -260,13 +282,12 @@ profilesRouter.route("/refreshToken").post(async (req, res, next) => {
           path: "/",
           httpOnly: true,
         });
-        res.send({
-          token: data.token,
-          refreshToken: data.refreshToken,
-        });
+        res.send({ ...user._doc, refresh_tokens: [], password: "" });
       }
     }
   } else {
+    console.log("catch");
+
     res.status(401).send();
   }
 });

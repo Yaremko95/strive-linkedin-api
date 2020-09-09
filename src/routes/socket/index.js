@@ -94,7 +94,7 @@ const socketHandler = (io) => {
         messages
       ) {
         const toDelete = messages
-          .map((msg) => JSON.stringify(msg))
+          .map((msg) => JSON.parse(msg))
           .find((msg) => msg._id === data._id);
         redisClient.lrem(
           `history:${user.username}`,
