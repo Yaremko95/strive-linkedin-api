@@ -49,7 +49,9 @@ const socketHandler = (io) => {
         const userExists = users
           .map((user) => JSON.parse(user))
           .find((json) => {
-            return json.socketid === socket.id;
+            return (
+              json.socketid === socket.id || json.username === socket.username
+            );
           });
         console.log(userExists);
         if (!userExists) {
