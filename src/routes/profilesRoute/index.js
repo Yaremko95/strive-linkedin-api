@@ -219,7 +219,7 @@ profilesRouter.route("/login").post(async (req, res, next) => {
           res.status(500).send(err);
         }
         const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET_KEY, {
-          expiresIn: "10000",
+          expiresIn: "1 week",
         });
         const refreshToken = jwt.sign(
           { _id: user._id },
@@ -236,12 +236,10 @@ profilesRouter.route("/login").post(async (req, res, next) => {
         );
         res.cookie("accessToken", token, {
           path: "/",
-          httpOnly: true,
         });
 
         res.cookie("refreshToken", refreshToken, {
           path: "/",
-          httpOnly: true,
         });
 
         return res.json({ ...user._doc, refresh_tokens: [], password: "" });
@@ -275,12 +273,10 @@ profilesRouter.route("/refreshToken").post(async (req, res, next) => {
         const data = await authenticate(user);
         res.cookie("accessToken", data.token, {
           path: "/",
-          httpOnly: true,
         });
 
         res.cookie("refreshToken", data.refreshToken, {
           path: "/",
-          httpOnly: true,
         });
         res.send({ ...user._doc, refresh_tokens: [], password: "" });
       }
