@@ -134,9 +134,14 @@ const socketHandler = (io) => {
           text: data.text,
         };
         console.log(newMsg);
+        socket.emit(socket.id, { ...newMsg, to: user.username });
         if (receivers.length > 0) {
           receivers.forEach((receiver) => {
-            socket.broadcast.to(receiver.socketid).emit("receiveMsg", newMsg);
+            io.emit("receiveMsg", newMsg);
+
+            // io.to(receiver.socketid).emit(newMsg);
+            // io.to(socket.id).emit(newMsg);
+            // socket.broadcast.to(receiver.socketid).emit("receiveMsg", newMsg);
           });
         }
         redisClient.lpush(`history:${user.username}`, JSON.stringify(newMsg));
