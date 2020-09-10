@@ -323,4 +323,133 @@ profilesRouter.route("/:profileId").post(
   }
 );
 
+profilesRouter.get(
+  "/login/facebook",
+  passport.authenticate("facebook", { scope: "email" })
+);
+
+profilesRouter.get(
+  "/login/facebookRedirect",
+  passport.authenticate("facebook"),
+  async (req, res, next) => {
+    try {
+      const { id, name, emails } = req.user;
+      const isExist = await ProfileSchema.findOne({ email: emails[0].value });
+      if (!isExist) {
+        const accessToken = jwt.sign({ _id: id }, process.env.JWT_SECRET_KEY, {
+          expiresIn: "1 week",
+        });
+        const refreshToken = jwt.sign(
+          { _id: id },
+          process.env.REFRESH_JWT_KEY,
+          {
+            expiresIn: "1 week",
+          }
+        );
+        const user = {
+          name: name.givenName,
+          surname: name.familyName,
+          email: emails[0].value,
+          facebookId: id,
+          refresh_tokens: [refreshToken],
+        };
+        const newUser = await new ProfileSchema(user);
+        await newUser.save();
+
+        res.cookie("accessToken", accessToken);
+        res.cookie("refreshToken", refreshToken);
+
+        return res.status(201).redirect("http://localhost:3000");
+
+        console.log(newUser);
+        res.send(newUser);
+      } else {
+        const accessToken = jwt.sign({ _id: id }, process.env.JWT_SECRET_KEY, {
+          expiresIn: "1 week",
+        });
+        const refreshToken = jwt.sign(
+          { _id: id },
+          process.env.REFRESH_JWT_KEY,
+          {
+            expiresIn: "1 week",
+          }
+        );
+        await ProfileSchema.findByIdAndUpdate(isExist.id, {
+          $push: { refresh_tokens: [refreshToken] },
+        });
+
+        res.cookie("accessToken", accessToken);
+        res.cookie("refreshToken", refreshToken);
+        return res.status(201).redirect("http://localhost:3000");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    // console.log(req.user);
+  }
+);
+
+profilesRouter.get("/login/linkedin", passport.authenticate("linkedin"));
+
+profilesRouter.get(
+  "/login/linkedinRedirect",
+  passport.authenticate("linkedin"),
+  async (req, res, next) => {
+    try {
+      const { id, name, emails } = req.user;
+      const isExist = await ProfileSchema.findOne({ email: emails[0].value });
+      if (!isExist) {
+        const accessToken = jwt.sign({ _id: id }, process.env.JWT_SECRET_KEY, {
+          expiresIn: "1 week",
+        });
+        const refreshToken = jwt.sign(
+          { _id: id },
+          process.env.REFRESH_JWT_KEY,
+          {
+            expiresIn: "1 week",
+          }
+        );
+        const user = {
+          name: name.givenName,
+          surname: name.familyName,
+          email: emails[0].value,
+          linkedinId: id,
+          refresh_tokens: [refreshToken],
+        };
+        const newUser = await new UserModel(user);
+        await newUser.save();
+
+        res.cookie("accessToken", accessToken);
+        res.cookie("refreshToken", refreshToken);
+
+        return res.status(201).redirect("http://localhost:3000");
+
+        // console.log(newUser);
+        // res.send(newUser);
+      } else {
+        const accessToken = jwt.sign({ _id: id }, process.env.JWT_SECRET_KEY, {
+          expiresIn: "1 week",
+        });
+        const refreshToken = jwt.sign(
+          { _id: id },
+          process.env.REFRESH_JWT_KEY,
+          {
+            expiresIn: "1 week",
+          }
+        );
+        await ProfileSchema.findByIdAndUpdate(isExist.id, {
+          $push: { refresh_tokens: [refreshToken] },
+        });
+
+        res.cookie("accessToken", accessToken);
+        res.cookie("refreshToken", refreshToken);
+        return res.status(201).redirect("http://localhost:3000");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+    // console.log(req.user);
+  }
+);
+
 module.exports = profilesRouter;
