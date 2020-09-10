@@ -63,7 +63,12 @@ const ProfileSchema = new Schema(
       required: false,
       defaultValue: "",
     },
-    facebookid: {
+    facebookId: {
+      type: String,
+      required: false,
+      defaultValue: "",
+    },
+    linkedinId: {
       type: String,
       required: false,
       defaultValue: "",
@@ -79,7 +84,7 @@ const ProfileSchema = new Schema(
 ProfileSchema.pre("save", async function preSave(next) {
   const user = this;
   if (!user.isModified("password")) next();
-  if (user.googleid || user.facebookid) next();
+  if (user.googleid || user.facebookId || user.linkedinId) next();
   else {
     try {
       const hash = await bcrypt.hash(user.password, 12);
@@ -93,7 +98,7 @@ ProfileSchema.pre("save", async function preSave(next) {
 ProfileSchema.pre("findOneAndUpdate", async function preUpdate(next) {
   const user = this;
   if (!user._update.password) next();
-  if (user.googleid || user.facebookid) next();
+  if (user.googleid || user.facebookId || user.linkedinId) next();
   else {
     try {
       console.log(this);
