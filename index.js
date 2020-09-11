@@ -77,7 +77,7 @@ app.use(
   commentsRouter
 );
 console.log(listEndpoints(app));
-const index = app.listen(process.env.PORT || 3000, () => {
+const index = app.listen(process.env.PORT || 1337, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });
 mongoose
