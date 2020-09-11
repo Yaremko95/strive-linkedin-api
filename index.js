@@ -86,33 +86,33 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(index);
-const io = socket(index);
-io.use(authorizeSocket);
-const pub = require("redis").createClient(
-  6380,
-  process.env.REDISCACHEHOSTNAME,
-  {
-    auth_pass: process.env.REDISCACHEKEY,
-    tls: {
-      servername: process.env.REDISCACHEHOSTNAME,
-    },
-  }
-);
-const sub = require("redis").createClient(
-  6380,
-  process.env.REDISCACHEHOSTNAME,
-  {
-    auth_pass: process.env.REDISCACHEKEY,
-    tls: {
-      servername: process.env.REDISCACHEHOSTNAME,
-    },
-  }
-);
-const socketio_redis = require("socket.io-redis");
-io.adapter(socketio_redis({ pubClient: pub, subClient: sub }));
-
-const redis = require("redis");
-socketHandler(io);
+// const io = socket(index);
+// io.use(authorizeSocket);
+// const pub = require("redis").createClient(
+//   6380,
+//   process.env.REDISCACHEHOSTNAME,
+//   {
+//     auth_pass: process.env.REDISCACHEKEY,
+//     tls: {
+//       servername: process.env.REDISCACHEHOSTNAME,
+//     },
+//   }
+// );
+// const sub = require("redis").createClient(
+//   6380,
+//   process.env.REDISCACHEHOSTNAME,
+//   {
+//     auth_pass: process.env.REDISCACHEKEY,
+//     tls: {
+//       servername: process.env.REDISCACHEHOSTNAME,
+//     },
+//   }
+// );
+// const socketio_redis = require("socket.io-redis");
+// io.adapter(socketio_redis({ pubClient: pub, subClient: sub }));
+//
+// const redis = require("redis");
+// socketHandler(io);
 // io.on("connection", socketHandler);
 
 // pub.on("ready", function () {
