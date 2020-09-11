@@ -90,21 +90,21 @@ const io = socket(index);
 io.use(authorizeSocket);
 const pub = require("redis").createClient(
   6380,
-  "linkedin.redis.cache.windows.net",
+  process.env.REDISCACHEHOSTNAME,
   {
-    auth_pass: "TLHylwE0D3MRPXOzpsSqWg98fWCPVCyNysDeqoAqR4o=",
+    auth_pass: process.env.REDISCACHEKEY,
     tls: {
-      servername: "linkedin.redis.cache.windows.net",
+      servername: process.env.REDISCACHEHOSTNAME,
     },
   }
 );
 const sub = require("redis").createClient(
   6380,
-  "linkedin.redis.cache.windows.net",
+  process.env.REDISCACHEHOSTNAME,
   {
-    auth_pass: "TLHylwE0D3MRPXOzpsSqWg98fWCPVCyNysDeqoAqR4o=",
+    auth_pass: process.env.REDISCACHEKEY,
     tls: {
-      servername: "linkedin.redis.cache.windows.net",
+      servername: process.env.REDISCACHEHOSTNAME,
     },
   }
 );
