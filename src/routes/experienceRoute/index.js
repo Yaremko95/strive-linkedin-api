@@ -8,6 +8,15 @@ const multer = require("multer");
 const fs = require("fs").promises;
 const upload = multer();
 const expDir = join(__dirname, "../../public/expPictures");
+const uploadFile = require("../../utils/azureBlob");
+const MulterAzureStorage = require("multer-azure-storage");
+const multerOptions = multer({
+  storage: new MulterAzureStorage({
+    azureStorageConnectionString: process.env.STORAGE_CS,
+    containerName: "experiences",
+    containerSecurity: "container",
+  }),
+});
 experienceRouter.get("/:userName/experiences", async (req, res, next) => {
   try {
     const experience = await ExperienceSchema.find({
@@ -140,25 +149,18 @@ experienceRouter.delete(
 );
 experienceRouter
   .route("/:userName/experiences/:id/picture")
-  .post(upload.single("picture"), async (req, res) => {
+  .post(multerOptions.single("experiences"), async (req, res) => {
     try {
       console.log(req.body);
       const item = await ExperienceSchema.findById(req.params.id);
 
       if (item) {
         if (item.username === req.user.username) {
-          const [filename, extension] = req.file.mimetype.split("/");
-          await fs.writeFile(
-            join(expDir, `${req.params.id}.${extension}`),
-            req.file.buffer
-          );
-          let url = `${req.protocol}://${req.host}${
-            process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-          }/static/expPictures/${req.params.id}.${extension}`;
+          await uploadFile("experiences", req.user);
           const result = await ExperienceSchema.findByIdAndUpdate(
             req.params.id,
             {
-              image: url,
+              image: req.file.url,
               username: req.user.username,
             }
           );

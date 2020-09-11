@@ -6,20 +6,20 @@ const listEndpoints = require("express-list-endpoints");
 
 const mongoose = require("mongoose");
 
-const postsRouter = require("./routes/postsRoute");
-const experienceRouter = require("./routes/experienceRoute");
-const commentsRouter = require("./routes/comments");
-const profilesRouter = require("./routes/profilesRoute");
-const educationRouter = require("./routes/educationRoute");
+const postsRouter = require("./src/routes/postsRoute");
+const experienceRouter = require("./src/routes/experienceRoute");
+const commentsRouter = require("./src/routes/comments");
+const profilesRouter = require("./src/routes/profilesRoute");
+const educationRouter = require("./src/routes/educationRoute");
 
-const makeDirectory = require("./utils/mkdir");
+const makeDirectory = require("./src/utils/mkdir");
 makeDirectory();
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-const pass = require("./passport");
+const pass = require("./src/passport");
 const socket = require("socket.io");
-const { authorizeSocket, socketHandler } = require("./routes/socket");
+const { authorizeSocket, socketHandler } = require("./src/routes/socket");
 const app = express();
 app.use(passport.initialize());
 app.use(cookieParser());
@@ -77,7 +77,7 @@ app.use(
   commentsRouter
 );
 console.log(listEndpoints(app));
-const server = app.listen(process.env.PORT || 3000, () => {
+const index = app.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });
 mongoose
@@ -85,11 +85,31 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(server);
-const io = socket(server);
+  .then(index);
+const io = socket(index);
 io.use(authorizeSocket);
+const pub = require("redis").createClient(
+  6380,
+  "linkedin.redis.cache.windows.net",
+  {
+    auth_pass: "TLHylwE0D3MRPXOzpsSqWg98fWCPVCyNysDeqoAqR4o=",
+    tls: {
+      servername: "linkedin.redis.cache.windows.net",
+    },
+  }
+);
+const sub = require("redis").createClient(
+  6380,
+  "linkedin.redis.cache.windows.net",
+  {
+    auth_pass: "TLHylwE0D3MRPXOzpsSqWg98fWCPVCyNysDeqoAqR4o=",
+    tls: {
+      servername: "linkedin.redis.cache.windows.net",
+    },
+  }
+);
 const socketio_redis = require("socket.io-redis");
-io.adapter(socketio_redis({ host: "localhost", port: 6379 }));
+io.adapter(socketio_redis({ pubClient: pub, subClient: sub }));
 
 const redis = require("redis");
 socketHandler(io);
