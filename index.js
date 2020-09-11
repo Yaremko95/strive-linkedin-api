@@ -45,6 +45,7 @@ app.use(function (req, res, next) {
   );
   next();
 });
+//dom
 
 app.set("twig options", {
   strict_variables: false,
