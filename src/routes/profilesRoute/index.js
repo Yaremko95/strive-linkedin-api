@@ -13,6 +13,17 @@ const passport = require("passport");
 const profilesDirectory = join(__dirname, "../../public/profiles");
 const jwt = require("jsonwebtoken");
 const { authenticate } = require("./helpers");
+const uploadFile = require("../../utils/azureBlob");
+require("dotenv").config();
+
+const MulterAzureStorage = require("multer-azure-storage");
+const multerOptions = multer({
+  storage: new MulterAzureStorage({
+    azureStorageConnectionString: process.env.STORAGE_CS,
+    containerName: "profile",
+    containerSecurity: "container",
+  }),
+});
 
 const profilesRouter = express.Router();
 
@@ -154,7 +165,7 @@ profilesRouter.put(
         res.status(403).send("unauthorized");
       else {
         delete req.body.refresh_tokens;
-        delete req.body.facebookid;
+        delete req.body.facebookId;
         delete req.body.googleid;
         delete req.body._id;
         const profile = await ProfileSchema.findOneAndUpdate(
@@ -166,7 +177,7 @@ profilesRouter.put(
           { runValidators: true }
         );
         if (profile) {
-          res.send({ ...profile, refresh_tokens: [] });
+          res.send({ ...profile._doc, refresh_tokens: [], password: "" });
         } else {
           const error = new Error(
             `Profile with username ${req.params.username} not found`
@@ -288,40 +299,49 @@ profilesRouter.route("/refreshToken").post(async (req, res, next) => {
   }
 });
 
-profilesRouter.route("/:profileId").post(
-  passport.authenticate("jwt", { session: false }),
-  upload.single("profile"),
+profilesRouter
+  .route("/:profileId")
+  .post(
+    passport.authenticate("jwt", { session: false }),
+    multerOptions.single("profile"),
+    async (req, res) => {
+      try {
+        console.log(req.user._id === req.params.profileId);
+        if (req.user._id == req.params.profileId) {
+          console.log("good");
+          await uploadFile("profile", req.user);
 
-  async (req, res) => {
-    try {
-      if (req.user._id === req.params.profileId) {
-        const [filename, extension] = req.file.mimetype.split("/");
-        await fs.writeFile(
-          join(profilesDirectory, `${req.params.profileId}.${extension}`),
-          req.file.buffer
-        );
+          // let container = await blobClient.getContainerClient("profile");
+          // const files = await container.listBlobsFlat();
+          //
+          // for await (const file of files) {
+          //   let url = await container.getBlobClient(file.name).url;
+          //   if (url === req.user.image) {
+          //     const cont = await blobClient.getContainerClient("profile");
+          //     console.log(await cont.getBlobClient(file.name)._name);
+          //     await cont.deleteBlob(await cont.getBlobClient(file.name)._name);
+          //   }
+          // }
 
-        let url = `${req.protocol}://${req.host}${
-          process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-        }/static/profiles/${req.params.profileId}.${extension}`;
-        const result = await ProfileSchema.findByIdAndUpdate(
-          req.params.profileId,
-          {
-            image: url,
-            username: user.name,
-          }
-        );
-        result.password = "";
-        res.status(200).send(result);
-      } else {
-        res.status(403).send("unauthorised");
+          const result = await ProfileSchema.findByIdAndUpdate(
+            req.params.profileId,
+            {
+              image: req.file.url,
+              username: req.user.username,
+            }
+          );
+          result.password = "";
+          result.refresh_tokens = [];
+          res.status(200).send(result);
+        } else {
+          res.status(403).send("unauthorised");
+        }
+      } catch (e) {
+        console.log(e);
+        res.status(500).send("bad request");
       }
-    } catch (e) {
-      console.log(e);
-      res.status(500).send("bad request");
     }
-  }
-);
+  );
 
 profilesRouter.get(
   "/login/facebook",
@@ -351,7 +371,8 @@ profilesRouter.get(
           surname: name.familyName,
           email: emails[0].value,
           facebookId: id,
-          refresh_tokens: [refreshToken],
+          refresh_tokens: [],
+          username: emails[0].value,
         };
         const newUser = await new ProfileSchema(user);
         await newUser.save();
@@ -359,7 +380,7 @@ profilesRouter.get(
         res.cookie("accessToken", accessToken);
         res.cookie("refreshToken", refreshToken);
 
-        return res.status(201).redirect("http://localhost:3000");
+        return res.status(201).redirect(`${process.env.FE_API}/profile/me`);
 
         console.log(newUser);
         res.send(newUser);
@@ -380,7 +401,7 @@ profilesRouter.get(
 
         res.cookie("accessToken", accessToken);
         res.cookie("refreshToken", refreshToken);
-        return res.status(201).redirect("http://localhost:3000");
+        return res.status(201).redirect(`${process.env.FE_API}/profile/me`);
       }
     } catch (error) {
       console.log(error);
@@ -415,14 +436,15 @@ profilesRouter.get(
           email: emails[0].value,
           linkedinId: id,
           refresh_tokens: [refreshToken],
+          username: "",
         };
-        const newUser = await new UserModel(user);
+        const newUser = await new ProfileSchema(user);
         await newUser.save();
 
         res.cookie("accessToken", accessToken);
         res.cookie("refreshToken", refreshToken);
 
-        return res.status(201).redirect("http://localhost:3000");
+        return res.status(201).redirect(`${process.env.FE_API}/profile/me`);
 
         // console.log(newUser);
         // res.send(newUser);
@@ -443,7 +465,7 @@ profilesRouter.get(
 
         res.cookie("accessToken", accessToken);
         res.cookie("refreshToken", refreshToken);
-        return res.status(201).redirect("http://localhost:3000");
+        return res.status(201).redirect(`${process.env.FE_API}/profile/me`);
       }
     } catch (error) {
       console.log(error);

@@ -1,8 +1,16 @@
+require("dotenv").config();
 const redis = require("redis");
-const redisClient = redis.createClient();
+const redisClient = redis.createClient(6380, process.env.REDISCACHEHOSTNAME, {
+  auth_pass: process.env.REDISCACHEKEY,
+  tls: {
+    servername: process.env.REDISCACHEHOSTNAME,
+  },
+});
+const bluebird = require("bluebird");
 const Profile = require("../../models/ProfileSchema");
 const jwt = require("jsonwebtoken");
 const uuid = require("uuid");
+
 const authorizeSocket = async (socket, next) => {
   try {
     const { accessToken } = socket.handshake.query;
@@ -40,6 +48,8 @@ const authorizeSocket = async (socket, next) => {
 
 const socketHandler = (io) => {
   io.on("connection", function (socket) {
+    console.log("connected");
+
     const { user } = socket;
 
     socket.on("login", async (options) => {
@@ -49,7 +59,9 @@ const socketHandler = (io) => {
         const userExists = users
           .map((user) => JSON.parse(user))
           .find((json) => {
-            return json.socketid === socket.id;
+            return (
+              json.socketid === socket.id || json.username === socket.username
+            );
           });
         console.log(userExists);
         if (!userExists) {

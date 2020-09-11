@@ -18,11 +18,27 @@ router.route("/").post(async (req, res) => {
 });
 router.route("/:postId").get(async (req, res) => {
   try {
-    const comments = await CommentModel.find({ elementId: req.params.postId });
+    const comments = await CommentModel.find({
+      elementId: req.params.postId,
+    });
     res.status(200).send(comments);
   } catch (e) {
     res.status(500).send(e);
   }
 });
+// .put(async (req, res) => {
+//   try {
+//     // const data = await CommentModel.findById(req.params.id);
+//     // if (req.user.username !== data.username)
+//     //   res.status(403).send("unauthorized");
+//     // else {
+//     const comments = await CommentModel.find({
+//       elementId: req.params.postId,
+//     });
+//     res.status(200).send(comments);
+//   } catch (e) {
+//     res.status(500).send(e);
+//   }
+// });
 
 module.exports = router;

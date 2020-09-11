@@ -11,6 +11,15 @@ const EducationModel = require("../../models/EduSchema");
 const router = express.Router();
 const upload = multer();
 const eduPictureDir = join(__dirname, "../../public/eduPictures");
+const uploadFile = require("../../utils/azureBlob");
+const MulterAzureStorage = require("multer-azure-storage");
+const multerOptions = multer({
+  storage: new MulterAzureStorage({
+    azureStorageConnectionString: process.env.STORAGE_CS,
+    containerName: "educations",
+    containerSecurity: "container",
+  }),
+});
 router
   .route("/:userName/educations")
   .get(async (req, res) => {
@@ -110,24 +119,17 @@ router
   });
 router
   .route("/:userName/educations/:id/picture")
-  .post(upload.single("picture"), async (req, res) => {
+  .post(multerOptions.single("educations"), async (req, res) => {
     try {
       console.log(req.body);
       const item = await EducationModel.findById(req.params.id);
 
       if (item) {
         if (item.username === req.user.username) {
-          const [filename, extension] = req.file.mimetype.split("/");
-          await fs.writeFile(
-            join(eduPictureDir, `${req.params.id}.${extension}`),
-            req.file.buffer
-          );
-          let url = `${req.protocol}://${req.host}${
-            process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-          }/static/eduPictures/${req.params.id}.${extension}`;
+          await uploadFile("educations", req.user);
           const result = await EducationModel.findByIdAndUpdate(req.params.id, {
-            image: url,
-            username: user.name,
+            image: req.file.url,
+            username: req.user.username,
           });
           res.status(200).send(result);
         } else {

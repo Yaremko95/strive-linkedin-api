@@ -9,6 +9,15 @@ const router = express.Router();
 const upload = multer();
 
 const postsDirectory = join(__dirname, "../../public/posts");
+const uploadFile = require("../../utils/azureBlob");
+const MulterAzureStorage = require("multer-azure-storage");
+const multerOptions = multer({
+  storage: new MulterAzureStorage({
+    azureStorageConnectionString: process.env.STORAGE_CS,
+    containerName: "posts",
+    containerSecurity: "container",
+  }),
+});
 router
   .route("/")
   .get(async (req, res, next) => {
@@ -132,37 +141,32 @@ router
     }
   });
 
-router.route("/:postId").post(upload.single("post"), async (req, res) => {
-  try {
-    const post = await PostSchema.findById(req.params.postId);
-    const user = basicAuth(req);
-    if (post) {
-      if (post.username === req.user.username) {
-        const [filename, extension] = req.file.mimetype.split("/");
-        await fs.writeFile(
-          join(postsDirectory, `${req.params.postId}.${extension}`),
-          req.file.buffer
-        );
+router
+  .route("/:postId")
+  .post(multerOptions.single("post"), async (req, res) => {
+    try {
+      const post = await PostSchema.findById(req.params.postId);
+      const user = basicAuth(req);
+      if (post) {
+        if (post.username === req.user.username) {
+          await uploadFile("profile", req.user);
 
-        let url = `${req.protocol}://${req.host}${
-          process.env.ENVIRONMENT === "dev" ? ":" + process.env.PORT : ""
-        }/static/posts/${req.params.postId}.${extension}`;
-        const result = await PostSchema.findByIdAndUpdate(req.params.postId, {
-          image: url,
-          username: req.user.username,
-        });
-        console.log(result);
-        res.status(200).send(result);
+          const result = await PostSchema.findByIdAndUpdate(req.params.postId, {
+            image: req.file.url,
+            username: req.user.username,
+          });
+          console.log(result);
+          res.status(200).send(result);
+        } else {
+          res.status(403).send("unauthorised");
+        }
       } else {
-        res.status(403).send("unauthorised");
+        res.status(404).send("not found");
       }
-    } else {
-      res.status(404).send("not found");
+    } catch (e) {
+      console.log(e);
+      res.status(500).send("bad request");
     }
-  } catch (e) {
-    console.log(e);
-    res.status(500).send("bad request");
-  }
-});
+  });
 
 module.exports = router;
